@@ -27,6 +27,7 @@ import { createExportPackageFiles, createZip, downloadZipFile } from './zipExpor
 const assetGrid = document.querySelector('#assetGrid');
 const assetList = document.querySelector('#assetList');
 const generatorForm = document.querySelector('#generatorForm');
+const generateButton = document.querySelector('#generateButton');
 const jobStatus = document.querySelector('#jobStatus');
 const spriteCount = document.querySelector('#spriteCount');
 const tileCount = document.querySelector('#tileCount');
@@ -69,12 +70,45 @@ const tileSetTitle = document.querySelector('#tileSetTitle');
 const tileSetDescription = document.querySelector('#tileSetDescription');
 const tileMapPreview = document.querySelector('#tileMapPreview');
 const tileVariantGrid = document.querySelector('#tileVariantGrid');
+const navControls = [...document.querySelectorAll('[data-nav-target]')];
+const pageSections = [...document.querySelectorAll('[data-section-key]')];
+const presetButtons = [...document.querySelectorAll('[data-generation-preset]')];
 
 const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
 
 const defaultPalette = ['#35d0ff', '#ff4d6d', '#ffd166', '#72ef9b', '#b8f7ff', '#f49f4d'];
 const defaultAssetTypes = ['角色', '道具', '图标', '地块'];
+const generationPresets = {
+  character: {
+    assetType: '角色',
+    intendedUse: '玩家角色',
+    description: '戴红色围巾的短剑骑士',
+    outlineMode: '中描边',
+    colorMode: '项目调色板'
+  },
+  tile: {
+    assetType: '地块',
+    intendedUse: '地图地块',
+    description: '可无缝拼接的森林草地地块',
+    outlineMode: '轻描边',
+    colorMode: '项目调色板'
+  },
+  item: {
+    assetType: '道具',
+    intendedUse: '背包图标',
+    description: '发光的古代铁剑道具',
+    outlineMode: '中描边',
+    colorMode: '项目调色板'
+  },
+  icon: {
+    assetType: '图标',
+    intendedUse: '背包图标',
+    description: '透明玻璃瓶中的红色治疗药水图标',
+    outlineMode: '粗描边',
+    colorMode: '项目调色板'
+  }
+};
 const legacyLabelMap = {
   'Forest Adventure': '森林冒险',
   'Untitled Asset Pack': '未命名素材包',
@@ -138,6 +172,7 @@ let generatedAssets = [...seedAssets];
 let activeJob = null;
 let savedAssets = loadSavedAssets();
 let activeLibraryFilter = '全部';
+let generationInProgress = false;
 
 function loadProject() {
   const fallbackProject = createDefaultProject();
@@ -375,6 +410,53 @@ function renderProject() {
   renderTileSetPreview();
 }
 
+function initializeNavigation() {
+  navControls.forEach((control) => {
+    control.addEventListener('click', () => {
+      scrollToSection(control.dataset.navTarget);
+    });
+  });
+
+  window.addEventListener('scroll', updateActiveNavigation, { passive: true });
+  updateActiveNavigation();
+}
+
+function scrollToSection(sectionKey) {
+  const section = getSectionByKey(sectionKey);
+
+  if (!section) {
+    return;
+  }
+
+  section.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+  setActiveNavigation(sectionKey);
+}
+
+function updateActiveNavigation() {
+  const viewportAnchor = window.scrollY + 180;
+  const currentSection =
+    [...pageSections]
+      .filter((section) => section.offsetTop <= viewportAnchor)
+      .sort((a, b) => b.offsetTop - a.offsetTop)[0] || pageSections[0];
+
+  if (currentSection?.dataset.sectionKey) {
+    setActiveNavigation(currentSection.dataset.sectionKey);
+  }
+}
+
+function setActiveNavigation(sectionKey) {
+  navControls.forEach((control) => {
+    control.classList.toggle('active', control.dataset.navTarget === sectionKey);
+  });
+}
+
+function getSectionByKey(sectionKey) {
+  return pageSections.find((section) => section.dataset.sectionKey === sectionKey);
+}
+
 function renderAnimationPreview() {
   const [asset] = getAnimatedAssets(generatedAssets);
 
@@ -537,6 +619,34 @@ function initializeGeneratorSchemaControls() {
   generatorForm.elements.intendedUse.value = '玩家角色';
 }
 
+function initializeGenerationPresets() {
+  presetButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      applyGenerationPreset(button.dataset.generationPreset);
+    });
+  });
+}
+
+function applyGenerationPreset(presetKey) {
+  const preset = generationPresets[presetKey];
+
+  if (!preset) {
+    return;
+  }
+
+  generatorForm.elements.assetType.value = preset.assetType;
+  generatorForm.elements.description.value = preset.description;
+  generatorForm.elements.outlineMode.value = preset.outlineMode;
+  generatorForm.elements.colorMode.value = preset.colorMode;
+  generatorForm.elements.intendedUse.value = preset.intendedUse;
+  generatorForm.elements.size.value = project.tileSize;
+  generatorForm.elements.count.value = '4';
+  presetButtons.forEach((button) => {
+    button.classList.toggle('active', button.dataset.generationPreset === presetKey);
+  });
+  renderRequestPreview();
+}
+
 function renderRequestPreview() {
   const request = createGenerationRequest(project, getGeneratorValues());
   const result = validateGenerationRequest(request);
@@ -566,27 +676,46 @@ function renderJobStatus(job) {
 }
 
 async function createGenerationJob(request) {
-  const response = await fetch('/api/generation/jobs', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request)
-  });
+  let response;
 
-  const payload = await response.json();
-
-  if (!response.ok) {
-    throw new Error(payload.details?.join('; ') || payload.error || '创建生成任务失败');
+  try {
+    response = await fetch('/api/generation/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    });
+  } catch {
+    throw new Error('无法连接生成服务，请通过 npm.cmd run dev 启动后访问本地地址。');
   }
+
+  const payload = await parseJsonResponse(response);
 
   return payload;
 }
 
 async function fetchGenerationJob(jobId) {
-  const response = await fetch(`/api/generation/jobs/${jobId}`);
-  const payload = await response.json();
+  let response;
+
+  try {
+    response = await fetch(`/api/generation/jobs/${jobId}`);
+  } catch {
+    throw new Error('无法获取生成任务，请确认本地服务仍在运行。');
+  }
+
+  return parseJsonResponse(response);
+}
+
+async function parseJsonResponse(response) {
+  let payload;
+
+  try {
+    payload = await response.json();
+  } catch {
+    throw new Error('生成服务返回了非 JSON 响应，请确认通过本地开发服务访问页面。');
+  }
 
   if (!response.ok) {
-    throw new Error(payload.error || '获取生成任务失败');
+    throw new Error(payload.details?.join('; ') || payload.error || '生成服务返回错误');
   }
 
   return payload;
@@ -602,6 +731,8 @@ async function pollGenerationJob(jobId) {
     saveAssetLibrary();
     renderAssets();
     renderLibrary();
+    renderExportCenter();
+    setGenerationInProgress(false);
     return;
   }
 
@@ -614,6 +745,7 @@ function showJobError(error) {
   jobStatus.textContent = '失败';
   jobStatus.className = 'chip danger';
   validationList.replaceChildren(createValidationItem(error.message, false));
+  setGenerationInProgress(false);
 }
 
 function createValidationItem(message, valid) {
@@ -634,6 +766,12 @@ function translateJobStatus(status) {
   return labels[status] || status;
 }
 
+function setGenerationInProgress(isInProgress) {
+  generationInProgress = isInProgress;
+  generateButton.disabled = isInProgress;
+  generateButton.textContent = isInProgress ? '生成中' : '生成素材';
+}
+
 function syncProjectFromForm() {
   const formData = new FormData(projectForm);
   project = {
@@ -651,6 +789,11 @@ function syncProjectFromForm() {
 
 generatorForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+
+  if (generationInProgress) {
+    return;
+  }
+
   const { request, result } = renderRequestPreview();
 
   if (!result.valid) {
@@ -660,6 +803,9 @@ generatorForm.addEventListener('submit', async (event) => {
   }
 
   try {
+    setGenerationInProgress(true);
+    jobStatus.textContent = '排队中';
+    jobStatus.className = 'chip';
     const job = await createGenerationJob(request);
     renderJobStatus(job);
     pollGenerationJob(job.id).catch(showJobError);
@@ -736,6 +882,8 @@ downloadZipButton.addEventListener('click', () => {
 });
 
 initializeGeneratorSchemaControls();
+initializeGenerationPresets();
+initializeNavigation();
 updateProjectForm();
 renderLibraryFilters();
 renderProject();

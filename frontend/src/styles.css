@@ -28,6 +28,10 @@ body {
     Inter, "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 button,
 input,
 select,
@@ -301,6 +305,10 @@ button {
   background: var(--cyan-soft);
 }
 
+.page-section {
+  scroll-margin-top: 18px;
+}
+
 .hero-strip {
   position: relative;
   overflow: hidden;
@@ -559,6 +567,30 @@ textarea:focus {
 
 .toggle-row {
   margin: 2px 0 18px;
+}
+
+.preset-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: -4px 0 14px;
+}
+
+.preset-button {
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: #10141d;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.preset-button:hover,
+.preset-button.active {
+  border-color: rgba(37, 199, 255, 0.58);
+  color: var(--cyan);
+  background: rgba(37, 199, 255, 0.12);
 }
 
 .toggle {
@@ -1150,7 +1182,8 @@ textarea:focus {
 }
 
 .ghost-action:disabled,
-.primary-action:disabled {
+.primary-action:disabled,
+.preset-button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -1224,7 +1257,8 @@ textarea:focus {
   .asset-grid,
   .asset-list,
   .config-grid,
-  .palette-editor {
+  .palette-editor,
+  .preset-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

@@ -21,11 +21,11 @@
       <main class="workspace">
         <nav class="rail" aria-label="主导航">
           <div class="rail-logo">S</div>
-          <button class="rail-item active" type="button" aria-label="工作台">工</button>
-          <button class="rail-item" type="button" aria-label="素材">素</button>
-          <button class="rail-item" type="button" aria-label="地块">块</button>
-          <button class="rail-item" type="button" aria-label="导出">出</button>
-          <button class="rail-item" type="button" aria-label="设置">设</button>
+          <button class="rail-item active" type="button" aria-label="工作台" data-nav-target="generator">工</button>
+          <button class="rail-item" type="button" aria-label="素材库" data-nav-target="library">素</button>
+          <button class="rail-item" type="button" aria-label="地块" data-nav-target="tileset">块</button>
+          <button class="rail-item" type="button" aria-label="导出" data-nav-target="export">出</button>
+          <button class="rail-item" type="button" aria-label="设置" data-nav-target="settings">设</button>
         </nav>
 
         <section class="console">
@@ -46,11 +46,11 @@
           </header>
 
           <div class="tabs" role="tablist" aria-label="工作区分区">
-            <button class="tab active" type="button">生成</button>
-            <button class="tab" type="button">角色</button>
-            <button class="tab" type="button">地块</button>
-            <button class="tab" type="button">素材库</button>
-            <button class="tab" type="button">导出</button>
+            <button class="tab active" type="button" data-nav-target="generator">生成</button>
+            <button class="tab" type="button" data-nav-target="animation">角色</button>
+            <button class="tab" type="button" data-nav-target="tileset">地块</button>
+            <button class="tab" type="button" data-nav-target="library">素材库</button>
+            <button class="tab" type="button" data-nav-target="export">导出</button>
           </div>
 
           <section class="hero-strip" aria-label="项目视觉主题">
@@ -61,7 +61,7 @@
             <div class="palette-strip" id="paletteStrip" aria-label="项目调色板"></div>
           </section>
 
-          <section class="project-config" aria-label="项目与风格配置">
+          <section class="project-config page-section" id="settingsSection" aria-label="项目与风格配置" data-section-key="settings">
             <form class="config-panel" id="projectForm">
               <div class="panel-heading">
                 <div>
@@ -143,7 +143,7 @@
             </aside>
           </section>
 
-          <section class="content-grid">
+          <section class="content-grid page-section" id="generatorSection" data-section-key="generator">
             <form class="generator-panel" id="generatorForm">
               <div class="panel-heading">
                 <div>
@@ -163,6 +163,13 @@
                 文本描述
                 <textarea id="prompt" name="description" rows="4">戴红色围巾的短剑骑士</textarea>
               </label>
+
+              <div class="preset-row" aria-label="生成快捷预设">
+                <button class="preset-button active" type="button" data-generation-preset="character">角色</button>
+                <button class="preset-button" type="button" data-generation-preset="tile">地块</button>
+                <button class="preset-button" type="button" data-generation-preset="item">道具</button>
+                <button class="preset-button" type="button" data-generation-preset="icon">图标</button>
+              </div>
 
               <div class="field-row">
                 <label>
@@ -206,7 +213,7 @@
                 </label>
               </div>
 
-              <button class="primary-action" type="submit">生成素材</button>
+              <button class="primary-action" id="generateButton" type="submit">生成素材</button>
             </form>
 
             <section class="results-panel" aria-label="生成素材">
@@ -245,7 +252,7 @@
             </div>
           </section>
 
-          <section class="animation-panel" aria-label="角色动画预览">
+          <section class="animation-panel page-section" id="animationSection" aria-label="角色动画预览" data-section-key="animation">
             <div class="panel-heading">
               <div>
                 <p class="section-kicker">动画</p>
@@ -263,7 +270,7 @@
             </div>
           </section>
 
-          <section class="tileset-panel" aria-label="地块拼接预览">
+          <section class="tileset-panel page-section" id="tilesetSection" aria-label="地块拼接预览" data-section-key="tileset">
             <div class="panel-heading">
               <div>
                 <p class="section-kicker">地块</p>
@@ -282,7 +289,7 @@
           </section>
 
           <section class="bottom-grid" aria-label="项目素材与导出状态">
-            <div class="library-panel">
+            <div class="library-panel page-section" id="librarySection" data-section-key="library">
               <div class="panel-heading">
                 <div>
                   <p class="section-kicker">素材库</p>
@@ -297,7 +304,7 @@
               <div class="asset-list" id="assetList"></div>
             </div>
 
-            <div class="export-panel">
+            <div class="export-panel page-section" id="exportSection" data-section-key="export">
               <div class="panel-heading">
                 <div>
                   <p class="section-kicker">导出</p>
