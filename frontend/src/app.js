@@ -1,3 +1,14 @@
+import {
+  assetTypes,
+  assetSizes,
+  colorModes,
+  createGenerationRequest,
+  generationCounts,
+  intendedUses,
+  outlineModes,
+  validateGenerationRequest
+} from '../../shared/generationSchema.js';
+
 const assetGrid = document.querySelector('#assetGrid');
 const assetList = document.querySelector('#assetList');
 const generatorForm = document.querySelector('#generatorForm');
@@ -20,6 +31,8 @@ const styleLockDescription = document.querySelector('#styleLockDescription');
 const assetTypeCount = document.querySelector('#assetTypeCount');
 const paletteCount = document.querySelector('#paletteCount');
 const sizeSelect = document.querySelector('#size');
+const requestPreview = document.querySelector('#requestPreview');
+const validationList = document.querySelector('#validationList');
 
 const projectStorageKey = 'spriteforge.project.v1';
 
@@ -28,12 +41,12 @@ const defaultAssetTypes = ['Character', 'Item', 'Icon', 'Tile'];
 
 function createDefaultProject() {
   return {
-  name: 'Forest Adventure',
-  gameType: 'Top-down RPG',
-  targetEngine: 'Godot',
-  tileSize: '32x32',
-  artStyle: 'Pixel Fantasy',
-  cameraView: 'Top-down',
+    name: 'Forest Adventure',
+    gameType: 'Top-down RPG',
+    targetEngine: 'Godot',
+    tileSize: '32x32',
+    artStyle: 'Pixel Fantasy',
+    cameraView: 'Top-down',
     palette: [...defaultPalette],
     assetTypes: [...defaultAssetTypes]
   };
@@ -157,6 +170,7 @@ function renderProject() {
   sizeSelect.value = project.tileSize;
   renderPaletteEditor();
   renderAssets();
+  renderRequestPreview();
 }
 
 function titleCase(value) {
@@ -167,21 +181,73 @@ function titleCase(value) {
     .join(' ');
 }
 
-function buildGeneratedAssets(formData) {
-  const type = formData.get('assetType');
-  const prompt = String(formData.get('prompt') || 'forest asset');
-  const count = Number(formData.get('count') || 4);
-  const baseName = titleCase(prompt).slice(0, 34);
+function buildGeneratedAssets(request) {
+  const baseName = titleCase(request.description).slice(0, 34);
   const activePalette = project.palette.length ? project.palette : defaultPalette;
 
-  return Array.from({ length: count }, (_, index) => ({
+  return Array.from({ length: request.count }, (_, index) => ({
     name: `${baseName} ${index + 1}`,
-    type,
+    type: request.assetType,
     color: activePalette[index % activePalette.length],
     accent: activePalette[(index + 2) % activePalette.length],
-    style: project.artStyle,
-    engine: project.targetEngine
+    style: request.style.artStyle,
+    engine: request.target.engine
   }));
+}
+
+function getGeneratorValues() {
+  const formData = new FormData(generatorForm);
+
+  return {
+    assetType: formData.get('assetType'),
+    description: formData.get('description'),
+    size: formData.get('size'),
+    count: formData.get('count'),
+    transparentBackground: generatorForm.elements.transparent.checked,
+    paletteLock: generatorForm.elements.paletteLock.checked,
+    outlineMode: formData.get('outlineMode'),
+    colorMode: formData.get('colorMode'),
+    intendedUse: formData.get('intendedUse')
+  };
+}
+
+function renderSelectOptions(selectElement, values) {
+  selectElement.replaceChildren(
+    ...values.map((value) => {
+      const option = document.createElement('option');
+      option.value = String(value);
+      option.textContent = String(value);
+      return option;
+    })
+  );
+}
+
+function initializeGeneratorSchemaControls() {
+  renderSelectOptions(generatorForm.elements.assetType, assetTypes);
+  renderSelectOptions(generatorForm.elements.size, assetSizes);
+  renderSelectOptions(generatorForm.elements.count, generationCounts);
+  renderSelectOptions(generatorForm.elements.outlineMode, outlineModes);
+  renderSelectOptions(generatorForm.elements.colorMode, colorModes);
+  renderSelectOptions(generatorForm.elements.intendedUse, intendedUses);
+}
+
+function renderRequestPreview() {
+  const request = createGenerationRequest(project, getGeneratorValues());
+  const result = validateGenerationRequest(request);
+
+  requestPreview.textContent = JSON.stringify(request, null, 2);
+  validationList.replaceChildren(
+    ...(result.valid ? [createValidationItem('Request schema valid', true)] : result.errors.map((error) => createValidationItem(error, false)))
+  );
+
+  return { request, result };
+}
+
+function createValidationItem(message, valid) {
+  const item = document.createElement('li');
+  item.className = valid ? 'valid' : 'invalid';
+  item.textContent = message;
+  return item;
 }
 
 function syncProjectFromForm() {
@@ -201,18 +267,26 @@ function syncProjectFromForm() {
 
 generatorForm.addEventListener('submit', (event) => {
   event.preventDefault();
+  const { request, result } = renderRequestPreview();
+
+  if (!result.valid) {
+    jobStatus.textContent = 'Invalid';
+    jobStatus.className = 'chip danger';
+    return;
+  }
+
   jobStatus.textContent = 'Generating';
   jobStatus.className = 'chip';
-
-  const formData = new FormData(generatorForm);
-
   window.setTimeout(() => {
-    generatedAssets = buildGeneratedAssets(formData);
+    generatedAssets = buildGeneratedAssets(request);
     renderAssets();
     jobStatus.textContent = 'Ready';
     jobStatus.className = 'chip success';
   }, 450);
 });
+
+generatorForm.addEventListener('input', renderRequestPreview);
+generatorForm.addEventListener('change', renderRequestPreview);
 
 projectForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -256,5 +330,6 @@ resetProjectButton.addEventListener('click', () => {
 });
 
 updateProjectForm();
+initializeGeneratorSchemaControls();
 renderProject();
 renderAssets();

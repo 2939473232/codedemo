@@ -257,6 +257,12 @@ button {
   background: rgba(114, 239, 155, 0.08);
 }
 
+.chip.danger {
+  border-color: rgba(255, 77, 109, 0.34);
+  color: var(--red);
+  background: rgba(255, 77, 109, 0.08);
+}
+
 .ghost-action {
   min-height: 30px;
   border: 1px solid var(--line);
@@ -447,7 +453,8 @@ button {
 .generator-panel,
 .results-panel,
 .library-panel,
-.export-panel {
+.export-panel,
+.schema-panel {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--panel);
@@ -455,7 +462,7 @@ button {
 
 .generator-panel,
 .results-panel {
-  min-height: 360px;
+  min-height: 470px;
   padding: 16px;
 }
 
@@ -613,6 +620,58 @@ textarea:focus {
   display: grid;
   grid-template-columns: repeat(4, minmax(112px, 1fr));
   gap: 12px;
+}
+
+.schema-panel {
+  margin-top: 14px;
+  padding: 16px;
+}
+
+.schema-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 14px;
+}
+
+.request-preview {
+  max-height: 250px;
+  margin: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px;
+  background: #090c12;
+  color: #bceeff;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.validation-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.validation-list li {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 10px;
+  background: #10141d;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.validation-list .valid {
+  border-color: rgba(114, 239, 155, 0.28);
+  color: var(--green);
+}
+
+.validation-list .invalid {
+  border-color: rgba(255, 77, 109, 0.28);
+  color: #ffb0bd;
 }
 
 .asset-card {
@@ -804,6 +863,7 @@ textarea:focus {
 
   .content-grid,
   .project-config,
+  .schema-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
   }

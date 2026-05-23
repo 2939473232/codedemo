@@ -3,9 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { generationSchema } from '../shared/generationSchema.js';
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url));
 const frontendDir = join(rootDir, 'frontend');
+const sharedDir = join(rootDir, 'shared');
 const port = Number(process.env.PORT || 5173);
 
 const mimeTypes = {
@@ -42,9 +44,12 @@ function isPathInside(basePath, targetPath) {
 async function serveStatic(request, response) {
   const requestedUrl = new URL(request.url || '/', `http://${request.headers.host}`);
   const pathname = requestedUrl.pathname === '/' ? '/index.html' : requestedUrl.pathname;
-  const filePath = join(frontendDir, decodeURIComponent(pathname));
+  const isSharedModule = pathname.startsWith('/shared/');
+  const staticDir = isSharedModule ? sharedDir : frontendDir;
+  const staticPathname = isSharedModule ? pathname.replace('/shared/', '/') : pathname;
+  const filePath = join(staticDir, decodeURIComponent(staticPathname));
 
-  if (!isPathInside(frontendDir, filePath)) {
+  if (!isPathInside(staticDir, filePath)) {
     sendJson(response, 403, { error: 'Forbidden' });
     return;
   }
@@ -55,6 +60,11 @@ async function serveStatic(request, response) {
     response.writeHead(200, { 'Content-Type': contentType });
     createReadStream(filePath).pipe(response);
   } catch {
+    if (isSharedModule) {
+      sendJson(response, 404, { error: 'Not found' });
+      return;
+    }
+
     response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
     createReadStream(join(frontendDir, 'index.html')).pipe(response);
   }
@@ -72,6 +82,11 @@ const server = createServer(async (request, response) => {
 
   if (request.url === '/api/demo-project') {
     sendJson(response, 200, demoProject);
+    return;
+  }
+
+  if (request.url === '/api/generation/schema') {
+    sendJson(response, 200, generationSchema);
     return;
   }
 

@@ -156,38 +156,42 @@
               <label>
                 Asset Type
                 <select id="assetType" name="assetType">
-                  <option>Character</option>
-                  <option>Item</option>
-                  <option>Icon</option>
-                  <option>Tile</option>
                 </select>
               </label>
 
               <label>
                 Prompt
-                <textarea id="prompt" name="prompt" rows="4">red scarf knight with a short sword</textarea>
+                <textarea id="prompt" name="description" rows="4">red scarf knight with a short sword</textarea>
               </label>
 
               <div class="field-row">
                 <label>
                   Size
                   <select id="size" name="size">
-                    <option>16x16</option>
-                    <option>32x32</option>
-                    <option>48x48</option>
-                    <option>64x64</option>
-                    <option>128x128</option>
                   </select>
                 </label>
                 <label>
                   Count
                   <select id="count" name="count">
-                    <option>4</option>
-                    <option>2</option>
-                    <option>8</option>
                   </select>
                 </label>
               </div>
+
+              <div class="field-row">
+                <label>
+                  Outline
+                  <select id="outlineMode" name="outlineMode"></select>
+                </label>
+                <label>
+                  Color Mode
+                  <select id="colorMode" name="colorMode"></select>
+                </label>
+              </div>
+
+              <label>
+                Intended Use
+                <select id="intendedUse" name="intendedUse"></select>
+              </label>
 
               <div class="toggle-row">
                 <label class="toggle">
@@ -215,6 +219,20 @@
               </div>
               <div class="asset-grid" id="assetGrid"></div>
             </section>
+          </section>
+
+          <section class="schema-panel" aria-label="Generation request schema preview">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">SCHEMA</p>
+                <h3>GenerationRequest Preview</h3>
+              </div>
+              <span class="chip">Shared Contract</span>
+            </div>
+            <div class="schema-grid">
+              <pre id="requestPreview" class="request-preview"></pre>
+              <ul id="validationList" class="validation-list"></ul>
+            </div>
           </section>
 
           <section class="bottom-grid" aria-label="Project assets and export status">
