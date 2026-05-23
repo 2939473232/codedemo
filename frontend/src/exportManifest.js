@@ -1,9 +1,12 @@
+import { getAnimatedAssets } from './spriteSheet.js';
+
 export function createExportManifest(project, assets, options = {}) {
   const createdAt = options.createdAt || new Date().toISOString();
   const projectId = options.projectId || createProjectId(project.name);
   const engine = project.targetEngine || 'Godot';
   const root = options.root || createExportRoot(engine);
   const files = assets.map((asset) => createManifestFile(asset, root));
+  const animatedAssets = getAnimatedAssets(files);
 
   return {
     manifestVersion: '2026-05-23.export.p0',
@@ -22,9 +25,18 @@ export function createExportManifest(project, assets, options = {}) {
       total: files.length,
       sprites: files.filter((file) => file.type !== '地块').length,
       tiles: files.filter((file) => file.type === '地块').length,
+      animations: animatedAssets.length,
       formats: ['PNG', 'SVG 预览', 'JSON', 'ZIP']
     },
     directories: createDirectoryPlan(root),
+    animations: animatedAssets.map((asset) => ({
+      assetId: asset.id,
+      assetName: asset.name,
+      type: 'spritesheet',
+      actions: ['idle', 'walk'],
+      path: `${root}/animations/${createAnimationBaseName(asset)}_spritesheet.svg`,
+      metadataPath: `${root}/animations/${createAnimationBaseName(asset)}_frames.json`
+    })),
     files
   };
 }
@@ -67,6 +79,7 @@ function createDirectoryPlan(root) {
     icons: `${root}/icons`,
     ui: `${root}/ui`,
     effects: `${root}/effects`,
+    animations: `${root}/animations`,
     manifest: `${root}/manifest.json`
   };
 }
@@ -87,6 +100,17 @@ function getAssetDirectory(type) {
 
 function createExportRoot(engine) {
   return engine === 'Unity' ? 'Assets/SpriteForge' : 'res://spriteforge';
+}
+
+function createAnimationBaseName(asset) {
+  return String(asset.fileName || getFileNameFromPath(asset.path) || asset.id || 'asset')
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/[^a-z0-9_-]+/gi, '_')
+    .replace(/^_+|_+$/g, '') || 'asset';
+}
+
+function getFileNameFromPath(path) {
+  return String(path || '').split('/').pop();
 }
 
 function createProjectId(name) {

@@ -20,6 +20,7 @@ import {
   mergeLibraryAssets
 } from './assetLibrary.js';
 import { createExportFileName, createExportManifest, downloadJsonFile } from './exportManifest.js';
+import { createSpriteSheet, getAnimatedAssets } from './spriteSheet.js';
 import { createExportPackageFiles, createZip, downloadZipFile } from './zipExport.js';
 
 const assetGrid = document.querySelector('#assetGrid');
@@ -57,6 +58,11 @@ const downloadZipButton = document.querySelector('#downloadZipButton');
 const manifestPreview = document.querySelector('#manifestPreview');
 const manifestRoot = document.querySelector('#manifestRoot');
 const packageFileCount = document.querySelector('#packageFileCount');
+const animationStage = document.querySelector('#animationStage');
+const animationStatus = document.querySelector('#animationStatus');
+const animationTitle = document.querySelector('#animationTitle');
+const animationDescription = document.querySelector('#animationDescription');
+const frameStrip = document.querySelector('#frameStrip');
 
 const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
@@ -227,6 +233,7 @@ function createPixelPreview(asset, index) {
 
 function renderAssets() {
   assetGrid.replaceChildren(...generatedAssets.map(createPixelPreview));
+  renderAnimationPreview();
 }
 
 function renderLibrary() {
@@ -357,6 +364,70 @@ function renderProject() {
   renderAssets();
   renderLibrary();
   renderRequestPreview();
+  renderAnimationPreview();
+}
+
+function renderAnimationPreview() {
+  const [asset] = getAnimatedAssets(generatedAssets);
+
+  if (!asset) {
+    animationStatus.textContent = '等待角色素材';
+    animationTitle.textContent = '暂无可预览角色';
+    animationDescription.textContent = '生成角色或敌人素材后，这里会自动展示 idle/walk 帧序列。';
+    animationStage.replaceChildren(createAnimationEmptyState());
+    frameStrip.replaceChildren();
+    return;
+  }
+
+  const sheet = createSpriteSheet(asset);
+  const currentFrame = sheet.frames.find((frame) => frame.action === 'walk' && frame.frame === 1) || sheet.frames[0];
+  animationStatus.textContent = `${sheet.frames.length} 帧`;
+  animationTitle.textContent = `${asset.name} 动画包`;
+  animationDescription.textContent = `${sheet.frameWidth}x${sheet.frameHeight} 单帧，${sheet.columns} 列 x ${sheet.rows} 行，包含待机 / 行走，可随 ZIP 导出帧坐标 JSON。`;
+  animationStage.replaceChildren(createAnimationFrame(asset, currentFrame, 'large'));
+  frameStrip.replaceChildren(...sheet.frames.map((frame) => createAnimationFrame(asset, frame, 'small')));
+}
+
+function createAnimationEmptyState() {
+  const empty = document.createElement('p');
+  empty.className = 'empty-state';
+  empty.textContent = '当前结果没有角色或敌人素材。';
+  return empty;
+}
+
+function createAnimationFrame(asset, frame, size) {
+  const frameElement = document.createElement('span');
+  frameElement.className = `animation-frame ${size}`;
+  frameElement.title = formatFrameLabel(frame);
+  frameElement.style.setProperty('--asset-color', asset.color || '#35d0ff');
+  frameElement.style.setProperty('--asset-accent', asset.accent || '#ff4d6d');
+  frameElement.style.setProperty('--step-offset', getFrameStepOffset(frame));
+  frameElement.style.setProperty('--breathe-offset', frame.action === 'idle' && frame.frame % 2 === 0 ? '1px' : '0px');
+  frameElement.dataset.action = frame.action;
+
+  const body = document.createElement('i');
+  body.className = 'animation-body';
+  const shine = document.createElement('i');
+  shine.className = 'animation-shine';
+  const leftFoot = document.createElement('i');
+  leftFoot.className = 'animation-foot left';
+  const rightFoot = document.createElement('i');
+  rightFoot.className = 'animation-foot right';
+  frameElement.append(body, shine, leftFoot, rightFoot);
+  return frameElement;
+}
+
+function getFrameStepOffset(frame) {
+  if (frame.action !== 'walk') {
+    return '0px';
+  }
+
+  return frame.frame % 2 === 0 ? '-2px' : '2px';
+}
+
+function formatFrameLabel(frame) {
+  const actionLabel = frame.action === 'walk' ? '行走' : '待机';
+  return `${actionLabel} ${frame.frame + 1}`;
 }
 
 function titleCase(value) {

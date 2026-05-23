@@ -1,3 +1,5 @@
+import { createSpriteSheetMetadata, createSpriteSheetSvg, getAnimatedAssets } from './spriteSheet.js';
+
 const textEncoder = new TextEncoder();
 const crcTable = createCrcTable();
 
@@ -19,23 +21,30 @@ export function createAssetSvg(asset) {
 }
 
 export function createExportReadme(manifest) {
+  const animationCount = manifest.animations?.length || 0;
+
   return [
     `# ${manifest.project.name}`,
     '',
     `目标引擎：${manifest.project.targetEngine}`,
     `美术风格：${manifest.project.artStyle}`,
     `素材数量：${manifest.summary.total}`,
+    `动画资源：${animationCount}`,
     '',
     '此资源包由 SpriteForge fallback 导出流程生成。',
     'SVG 文件是原型阶段的轻量预览文件，后续可替换为真实 PNG 输出。',
+    '角色和敌人素材会附带 spritesheet SVG 与帧坐标 JSON，可用于动画预览或引擎导入。',
     ''
   ].join('\n');
 }
 
 export function createExportPackageFiles(manifest) {
   const root = manifest.project.targetEngine === 'Unity' ? 'Assets/SpriteForge' : 'spriteforge';
+  const animations = createAnimationFiles(manifest.files, root);
+  const animationManifestEntries = animations.map((file) => file.manifestEntry).filter(Boolean);
   const manifestForZip = {
     ...manifest,
+    animations: animationManifestEntries,
     files: manifest.files.map((file) => ({
       ...file,
       packagePath: normalizeZipPath(file.path)
@@ -48,7 +57,7 @@ export function createExportPackageFiles(manifest) {
     },
     {
       path: `${root}/README.md`,
-      content: createExportReadme(manifest)
+      content: createExportReadme(manifestForZip)
     }
   ];
 
@@ -57,6 +66,13 @@ export function createExportPackageFiles(manifest) {
     files.push({
       path: svgPath,
       content: createAssetSvg(file)
+    });
+  }
+
+  for (const file of animations) {
+    files.push({
+      path: file.path,
+      content: file.content
     });
   }
 
@@ -139,6 +155,49 @@ export function downloadZipFile(fileName, zipBytes) {
 
 function normalizeZipPath(path) {
   return path.replace(/^res:\/\//, '').replace(/\\/g, '/');
+}
+
+function createAnimationFiles(files, root) {
+  return getAnimatedAssets(files).flatMap((asset) => {
+    const baseName = createAnimationBaseName(asset);
+    const svgPath = `${root}/animations/${baseName}_spritesheet.svg`;
+    const jsonPath = `${root}/animations/${baseName}_frames.json`;
+    const metadata = createSpriteSheetMetadata(asset);
+
+    return [
+      {
+        path: svgPath,
+        content: createSpriteSheetSvg(asset),
+        manifestEntry: {
+          assetId: asset.id,
+          assetName: asset.name,
+          actionSet: ['idle', 'walk'],
+          type: 'spritesheet',
+          path: svgPath,
+          metadataPath: jsonPath,
+          frameSize: metadata.frameSize,
+          imageSize: metadata.imageSize,
+          fps: metadata.fps
+        }
+      },
+      {
+        path: jsonPath,
+        content: JSON.stringify(metadata, null, 2),
+        manifestEntry: null
+      }
+    ];
+  });
+}
+
+function createAnimationBaseName(asset) {
+  return String(asset.fileName || getFileNameFromPath(asset.path) || asset.id || 'asset')
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/[^a-z0-9_-]+/gi, '_')
+    .replace(/^_+|_+$/g, '') || 'asset';
+}
+
+function getFileNameFromPath(path) {
+  return String(path || '').split('/').pop();
 }
 
 function concatUint8Arrays(parts) {

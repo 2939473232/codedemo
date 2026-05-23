@@ -454,6 +454,7 @@ button {
 .results-panel,
 .library-panel,
 .export-panel,
+.animation-panel,
 .schema-panel {
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -630,6 +631,149 @@ textarea:focus {
 .schema-panel {
   margin-top: 14px;
   padding: 16px;
+}
+
+.animation-panel {
+  margin-top: 14px;
+  padding: 16px;
+}
+
+.animation-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.animation-stage {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.04) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.04) 75%),
+    #090c12;
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+.animation-details {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.animation-details strong {
+  font-size: 15px;
+}
+
+.animation-details p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.frame-strip {
+  display: grid;
+  grid-template-columns: repeat(8, 54px);
+  gap: 8px;
+}
+
+.animation-frame {
+  position: relative;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #0c1118;
+}
+
+.animation-frame.large {
+  width: 96px;
+  height: 96px;
+  animation: sprite-bob 720ms steps(2) infinite;
+}
+
+.animation-frame.small {
+  width: 54px;
+  height: 54px;
+}
+
+.animation-frame[data-action="walk"] {
+  border-color: rgba(37, 199, 255, 0.32);
+}
+
+.animation-body,
+.animation-shine,
+.animation-foot {
+  position: absolute;
+  display: block;
+}
+
+.animation-body {
+  left: calc(50% - 18px + var(--step-offset));
+  top: calc(22% - var(--breathe-offset));
+  width: 36px;
+  height: 46px;
+  border-radius: 4px;
+  background: var(--asset-color);
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.34);
+}
+
+.animation-shine {
+  top: 32%;
+  right: 36%;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  opacity: 0.82;
+}
+
+.animation-foot {
+  bottom: 17%;
+  width: 18px;
+  height: 9px;
+  background: var(--asset-accent);
+}
+
+.animation-foot.left {
+  left: calc(27% - var(--step-offset));
+}
+
+.animation-foot.right {
+  right: calc(27% - var(--step-offset));
+}
+
+.animation-frame.small .animation-body {
+  left: calc(50% - 10px + var(--step-offset));
+  width: 20px;
+  height: 26px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.34);
+}
+
+.animation-frame.small .animation-shine {
+  width: 6px;
+  height: 6px;
+}
+
+.animation-frame.small .animation-foot {
+  width: 10px;
+  height: 5px;
+}
+
+@keyframes sprite-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .schema-grid {
@@ -977,6 +1121,7 @@ textarea:focus {
   .content-grid,
   .project-config,
   .schema-grid,
+  .animation-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
   }
@@ -986,5 +1131,9 @@ textarea:focus {
   .config-grid,
   .palette-editor {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .frame-strip {
+    grid-template-columns: repeat(4, 54px);
   }
 }
