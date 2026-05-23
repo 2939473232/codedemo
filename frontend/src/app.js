@@ -56,10 +56,10 @@ function createDefaultProject() {
 }
 
 const seedAssets = [
-  { name: 'Red Scarf Knight', type: 'Character', color: '#35d0ff', accent: '#ff4d6d' },
-  { name: 'Iron Sword', type: 'Item', color: '#b8f7ff', accent: '#ffd166' },
-  { name: 'Health Potion', type: 'Icon', color: '#ff4d6d', accent: '#72ef9b' },
-  { name: 'Forest Tile', type: 'Tile', color: '#72ef9b', accent: '#2b6f4a' }
+  { name: 'Red Scarf Knight', type: 'Character', fileName: 'red_scarf_knight_32x32.png', color: '#35d0ff', accent: '#ff4d6d' },
+  { name: 'Iron Sword', type: 'Item', fileName: 'iron_sword_32x32.png', color: '#b8f7ff', accent: '#ffd166' },
+  { name: 'Health Potion', type: 'Icon', fileName: 'health_potion_32x32.png', color: '#ff4d6d', accent: '#72ef9b' },
+  { name: 'Forest Tile', type: 'Tile', fileName: 'forest_tile_32x32.png', color: '#72ef9b', accent: '#2b6f4a' }
 ];
 
 let project = loadProject();
@@ -101,7 +101,7 @@ function createPixelPreview(asset, index) {
     </div>
     <div>
       <strong>${asset.name}</strong>
-      <p>${asset.type} / v${index + 1}</p>
+      <p>${asset.type} / ${asset.width || 32}x${asset.height || 32} / v${index + 1}</p>
     </div>
   `;
   return cell;
@@ -118,7 +118,7 @@ function renderAssets() {
       <span class="mini-swatch" style="background:${asset.color}"></span>
       <span>
         <strong>${asset.name}</strong>
-        <small>${asset.type} / ${index + 1}.png</small>
+        <small>${asset.type} / ${asset.fileName || `${index + 1}.png`}</small>
       </span>
     `;
     return item;
@@ -126,7 +126,7 @@ function renderAssets() {
 
   assetList.replaceChildren(...listItems);
   spriteCount.textContent = String(generatedAssets.length);
-  tileCount.textContent = project.tileSize === '32x32' ? '9' : '6';
+  tileCount.textContent = String(generatedAssets.filter((asset) => asset.type === 'Tile').length || (project.tileSize === '32x32' ? 9 : 6));
 }
 
 function renderPaletteEditor() {
@@ -183,20 +183,6 @@ function titleCase(value) {
     .filter(Boolean)
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
-}
-
-function buildGeneratedAssets(request) {
-  const baseName = titleCase(request.description).slice(0, 34);
-  const activePalette = project.palette.length ? project.palette : defaultPalette;
-
-  return Array.from({ length: request.count }, (_, index) => ({
-    name: `${baseName} ${index + 1}`,
-    type: request.assetType,
-    color: activePalette[index % activePalette.length],
-    accent: activePalette[(index + 2) % activePalette.length],
-    style: request.style.artStyle,
-    engine: request.target.engine
-  }));
 }
 
 function getGeneratorValues() {
@@ -295,7 +281,7 @@ async function pollGenerationJob(jobId) {
   renderJobStatus(job);
 
   if (job.status === 'completed') {
-    generatedAssets = buildGeneratedAssets(job.request);
+    generatedAssets = job.result?.assets || [];
     renderAssets();
     return;
   }

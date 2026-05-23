@@ -33,6 +33,8 @@ assert(fetched.ok, 'Expected created job to be fetchable');
 assert(fetched.payload.request.projectId === 'forest-adventure', 'Expected job to store request');
 assert(listGenerationJobs().length >= 1, 'Expected job list to include created job');
 
+await waitForJobCompletion(created.payload.id);
+
 const invalid = createGenerationJob({ ...request, count: 3 });
 assert(!invalid.ok, 'Expected invalid job creation to fail');
 assert(invalid.statusCode === 422, 'Expected invalid job to return 422');
@@ -44,4 +46,22 @@ function assert(condition, message) {
     console.error(message);
     process.exit(1);
   }
+}
+
+async function waitForJobCompletion(jobId) {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const result = getGenerationJob(jobId);
+
+    if (result.payload.status === 'completed') {
+      assert(result.payload.result.assets.length === 4, 'Expected completed job assets');
+      assert(result.payload.result.manifest.files.length === 4, 'Expected completed job manifest files');
+      return;
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 120);
+    });
+  }
+
+  assert(false, 'Expected job to complete within test window');
 }

@@ -1,4 +1,5 @@
 import { validateGenerationRequest } from '../shared/generationSchema.js';
+import { createFallbackManifest, generateFallbackAssets } from './fallbackGenerator.js';
 
 const jobs = new Map();
 const jobTimeline = [
@@ -88,6 +89,7 @@ function scheduleJob(jobId) {
 
 function buildJobResult(job) {
   const { request } = job;
+  const assets = generateFallbackAssets(request);
 
   return {
     assetCount: request.count,
@@ -95,7 +97,9 @@ function buildJobResult(job) {
     style: request.style.artStyle,
     engine: request.target.engine,
     exportHint: `${request.target.engine} ready ${request.size} PNG sequence`,
-    previewSeed: `${request.projectId}:${request.assetType}:${request.description}`
+    previewSeed: `${request.projectId}:${request.assetType}:${request.description}`,
+    assets,
+    manifest: createFallbackManifest(request, assets)
   };
 }
 
