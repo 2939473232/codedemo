@@ -32,12 +32,16 @@
           <header class="topbar">
             <div>
               <p class="section-kicker">WORKSPACE</p>
-              <h2>Forest Adventure</h2>
+              <h2 id="projectTitle">Forest Adventure</h2>
             </div>
-            <div class="status-cluster" aria-label="Project summary">
-              <span>Godot</span>
-              <span>32x32</span>
-              <span class="pulse">Ready</span>
+            <div class="topbar-actions">
+              <div class="status-cluster" aria-label="Project summary">
+                <span id="engineBadge">Godot</span>
+                <span id="sizeBadge">32x32</span>
+                <span id="styleBadge">Pixel Fantasy</span>
+              </div>
+              <button class="ghost-action" id="newProjectButton" type="button">New Project</button>
+              <span class="chip success">Ready</span>
             </div>
           </header>
 
@@ -52,8 +56,91 @@
           <section class="hero-strip" aria-label="Project visual theme">
             <div class="hero-fade">
               <p>Style Preset</p>
-              <strong>Pixel Fantasy / Top-down / Teal Forest</strong>
+              <strong id="styleSummary">Pixel Fantasy / Top-down / Teal Forest</strong>
             </div>
+            <div class="palette-strip" id="paletteStrip" aria-label="Project palette"></div>
+          </section>
+
+          <section class="project-config" aria-label="Project and style configuration">
+            <form class="config-panel" id="projectForm">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-kicker">PROJECT</p>
+                  <h3>Project Setup</h3>
+                </div>
+                <span class="chip">Auto Saved</span>
+              </div>
+
+              <div class="config-grid">
+                <label>
+                  Project Name
+                  <input id="projectName" name="name" type="text" maxlength="32" required />
+                </label>
+                <label>
+                  Game Type
+                  <select id="gameType" name="gameType">
+                    <option value="Top-down RPG">Top-down RPG</option>
+                    <option value="Platformer">Platformer</option>
+                    <option value="Roguelike">Roguelike</option>
+                    <option value="Card Battler">Card Battler</option>
+                  </select>
+                </label>
+                <label>
+                  Target Engine
+                  <select id="targetEngine" name="targetEngine">
+                    <option value="Godot">Godot</option>
+                    <option value="Unity">Unity</option>
+                    <option value="Cocos Creator">Cocos Creator</option>
+                    <option value="Tiled">Tiled</option>
+                  </select>
+                </label>
+                <label>
+                  Tile Size
+                  <select id="tileSize" name="tileSize">
+                    <option value="16x16">16x16</option>
+                    <option value="32x32">32x32</option>
+                    <option value="48x48">48x48</option>
+                    <option value="64x64">64x64</option>
+                  </select>
+                </label>
+                <label>
+                  Art Style
+                  <select id="artStyle" name="artStyle">
+                    <option value="Pixel Fantasy">Pixel Fantasy</option>
+                    <option value="Hand Painted">Hand Painted</option>
+                    <option value="Cyber Neon">Cyber Neon</option>
+                    <option value="Dark Gothic">Dark Gothic</option>
+                    <option value="Cute Chibi">Cute Chibi</option>
+                  </select>
+                </label>
+                <label>
+                  Camera View
+                  <select id="cameraView" name="cameraView">
+                    <option value="Top-down">Top-down</option>
+                    <option value="Side View">Side View</option>
+                    <option value="Isometric">Isometric</option>
+                    <option value="Icon Front">Icon Front</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="palette-editor" id="paletteEditor" aria-label="Palette editor"></div>
+
+              <div class="form-actions">
+                <button class="primary-action compact" type="submit">Save Project</button>
+                <button class="ghost-action" id="resetProjectButton" type="button">Reset Demo</button>
+              </div>
+            </form>
+
+            <aside class="style-card" aria-label="Style inheritance preview">
+              <p class="section-kicker">STYLE LOCK</p>
+              <h3 id="styleLockTitle">Pixel Fantasy Pack</h3>
+              <p id="styleLockDescription">Generation requests inherit project engine, view, tile size, palette, and style language.</p>
+              <div class="style-metrics">
+                <span><strong id="assetTypeCount">4</strong> asset types</span>
+                <span><strong id="paletteCount">6</strong> colors</span>
+              </div>
+            </aside>
           </section>
 
           <section class="content-grid">
@@ -85,7 +172,9 @@
                 <label>
                   Size
                   <select id="size" name="size">
+                    <option>16x16</option>
                     <option>32x32</option>
+                    <option>48x48</option>
                     <option>64x64</option>
                     <option>128x128</option>
                   </select>
@@ -153,11 +242,11 @@
                 </div>
                 <div>
                   <dt>Tiles</dt>
-                  <dd>9</dd>
+                  <dd id="tileCount">9</dd>
                 </div>
                 <div>
-                  <dt>Format</dt>
-                  <dd>PNG + JSON</dd>
+                  <dt>Engine</dt>
+                  <dd id="manifestEngine">Godot</dd>
                 </div>
               </dl>
             </div>
