@@ -33,6 +33,9 @@ const paletteCount = document.querySelector('#paletteCount');
 const sizeSelect = document.querySelector('#size');
 const requestPreview = document.querySelector('#requestPreview');
 const validationList = document.querySelector('#validationList');
+const activeJobId = document.querySelector('#activeJobId');
+const jobProgressBar = document.querySelector('#jobProgressBar');
+const jobProgressValue = document.querySelector('#jobProgressValue');
 
 const projectStorageKey = 'spriteforge.project.v1';
 
@@ -61,6 +64,7 @@ const seedAssets = [
 
 let project = loadProject();
 let generatedAssets = [...seedAssets];
+let activeJob = null;
 
 function loadProject() {
   const fallbackProject = createDefaultProject();
@@ -243,6 +247,70 @@ function renderRequestPreview() {
   return { request, result };
 }
 
+function renderJobStatus(job) {
+  activeJob = job;
+  activeJobId.textContent = job ? job.id : 'No active job';
+  jobProgressValue.textContent = job ? `${job.progress}%` : '0%';
+  jobProgressBar.style.width = job ? `${job.progress}%` : '0%';
+
+  if (!job) {
+    jobStatus.textContent = 'Idle';
+    jobStatus.className = 'chip success';
+    return;
+  }
+
+  jobStatus.textContent = titleCase(job.status);
+  jobStatus.className = job.status === 'completed' ? 'chip success' : 'chip';
+}
+
+async function createGenerationJob(request) {
+  const response = await fetch('/api/generation/jobs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request)
+  });
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload.details?.join('; ') || payload.error || 'Failed to create generation job');
+  }
+
+  return payload;
+}
+
+async function fetchGenerationJob(jobId) {
+  const response = await fetch(`/api/generation/jobs/${jobId}`);
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload.error || 'Failed to fetch generation job');
+  }
+
+  return payload;
+}
+
+async function pollGenerationJob(jobId) {
+  const job = await fetchGenerationJob(jobId);
+  renderJobStatus(job);
+
+  if (job.status === 'completed') {
+    generatedAssets = buildGeneratedAssets(job.request);
+    renderAssets();
+    return;
+  }
+
+  window.setTimeout(() => {
+    pollGenerationJob(jobId).catch(showJobError);
+  }, 260);
+}
+
+function showJobError(error) {
+  jobStatus.textContent = 'Failed';
+  jobStatus.className = 'chip danger';
+  validationList.replaceChildren(createValidationItem(error.message, false));
+}
+
 function createValidationItem(message, valid) {
   const item = document.createElement('li');
   item.className = valid ? 'valid' : 'invalid';
@@ -265,7 +333,7 @@ function syncProjectFromForm() {
   renderProject();
 }
 
-generatorForm.addEventListener('submit', (event) => {
+generatorForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const { request, result } = renderRequestPreview();
 
@@ -275,14 +343,13 @@ generatorForm.addEventListener('submit', (event) => {
     return;
   }
 
-  jobStatus.textContent = 'Generating';
-  jobStatus.className = 'chip';
-  window.setTimeout(() => {
-    generatedAssets = buildGeneratedAssets(request);
-    renderAssets();
-    jobStatus.textContent = 'Ready';
-    jobStatus.className = 'chip success';
-  }, 450);
+  try {
+    const job = await createGenerationJob(request);
+    renderJobStatus(job);
+    pollGenerationJob(job.id).catch(showJobError);
+  } catch (error) {
+    showJobError(error);
+  }
 });
 
 generatorForm.addEventListener('input', renderRequestPreview);
@@ -333,3 +400,4 @@ updateProjectForm();
 initializeGeneratorSchemaControls();
 renderProject();
 renderAssets();
+renderJobStatus(activeJob);

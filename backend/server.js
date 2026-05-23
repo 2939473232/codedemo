@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createGenerationJob, getGenerationJob, listGenerationJobs } from './generationJobs.js';
 import { generationSchema } from '../shared/generationSchema.js';
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url));
@@ -34,6 +35,20 @@ const demoProject = {
 function sendJson(response, statusCode, payload) {
   response.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
   response.end(JSON.stringify(payload, null, 2));
+}
+
+async function readJsonBody(request) {
+  const chunks = [];
+
+  for await (const chunk of request) {
+    chunks.push(chunk);
+  }
+
+  if (!chunks.length) {
+    return null;
+  }
+
+  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 
 function isPathInside(basePath, targetPath) {
@@ -71,6 +86,8 @@ async function serveStatic(request, response) {
 }
 
 const server = createServer(async (request, response) => {
+  const requestedUrl = new URL(request.url || '/', `http://${request.headers.host}`);
+
   if (request.url === '/api/health') {
     sendJson(response, 200, {
       ok: true,
@@ -85,8 +102,31 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (request.url === '/api/generation/schema') {
+  if (requestedUrl.pathname === '/api/generation/schema') {
     sendJson(response, 200, generationSchema);
+    return;
+  }
+
+  if (requestedUrl.pathname === '/api/generation/jobs' && request.method === 'GET') {
+    sendJson(response, 200, { jobs: listGenerationJobs() });
+    return;
+  }
+
+  if (requestedUrl.pathname === '/api/generation/jobs' && request.method === 'POST') {
+    try {
+      const payload = await readJsonBody(request);
+      const result = createGenerationJob(payload);
+      sendJson(response, result.statusCode, result.payload);
+    } catch {
+      sendJson(response, 400, { error: 'Request body must be valid JSON' });
+    }
+    return;
+  }
+
+  const jobMatch = requestedUrl.pathname.match(/^\/api\/generation\/jobs\/([^/]+)$/);
+  if (jobMatch && request.method === 'GET') {
+    const result = getGenerationJob(jobMatch[1]);
+    sendJson(response, result.statusCode, result.payload);
     return;
   }
 

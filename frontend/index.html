@@ -231,7 +231,17 @@
             </div>
             <div class="schema-grid">
               <pre id="requestPreview" class="request-preview"></pre>
-              <ul id="validationList" class="validation-list"></ul>
+              <div class="job-column">
+                <ul id="validationList" class="validation-list"></ul>
+                <div class="job-status-card">
+                  <p class="section-kicker">JOB</p>
+                  <strong id="activeJobId">No active job</strong>
+                  <div class="progress-track" aria-label="Generation job progress">
+                    <span id="jobProgressBar"></span>
+                  </div>
+                  <small id="jobProgressValue">0%</small>
+                </div>
+              </div>
             </div>
           </section>
 

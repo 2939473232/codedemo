@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "node backend/server.js",
     "start": "node backend/server.js",
-    "check": "node --check backend/server.js && node --check frontend/src/app.js && node --check shared/generationSchema.js",
-    "test": "node scripts/test-generation-schema.js"
+    "check": "node --check backend/server.js && node --check backend/generationJobs.js && node --check frontend/src/app.js && node --check shared/generationSchema.js",
+    "test": "node scripts/test-generation-schema.js && node scripts/test-generation-jobs.js",
+    "smoke:api": "node scripts/smoke-generation-api.js"
   },
   "engines": {
     "node": ">=20"
