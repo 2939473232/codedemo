@@ -8,6 +8,13 @@ import {
   outlineModes,
   validateGenerationRequest
 } from '../../shared/generationSchema.js';
+import {
+  createLibraryAssetsFromJob,
+  filterLibraryAssets,
+  getLibraryStats,
+  libraryFilters,
+  mergeLibraryAssets
+} from './assetLibrary.js';
 
 const assetGrid = document.querySelector('#assetGrid');
 const assetList = document.querySelector('#assetList');
@@ -36,8 +43,12 @@ const validationList = document.querySelector('#validationList');
 const activeJobId = document.querySelector('#activeJobId');
 const jobProgressBar = document.querySelector('#jobProgressBar');
 const jobProgressValue = document.querySelector('#jobProgressValue');
+const libraryFiltersElement = document.querySelector('#libraryFilters');
+const libraryCount = document.querySelector('#libraryCount');
+const clearLibraryButton = document.querySelector('#clearLibraryButton');
 
 const projectStorageKey = 'spriteforge.project.v1';
+const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
 
 const defaultPalette = ['#35d0ff', '#ff4d6d', '#ffd166', '#72ef9b', '#b8f7ff', '#f49f4d'];
 const defaultAssetTypes = ['Character', 'Item', 'Icon', 'Tile'];
@@ -65,6 +76,8 @@ const seedAssets = [
 let project = loadProject();
 let generatedAssets = [...seedAssets];
 let activeJob = null;
+let savedAssets = loadSavedAssets();
+let activeLibraryFilter = 'All';
 
 function loadProject() {
   const fallbackProject = createDefaultProject();
@@ -91,42 +104,101 @@ function saveProject() {
   window.localStorage.setItem(projectStorageKey, JSON.stringify(project));
 }
 
+function loadSavedAssets() {
+  try {
+    const storedAssets = window.localStorage.getItem(assetLibraryStorageKey);
+    return storedAssets ? JSON.parse(storedAssets) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAssetLibrary() {
+  window.localStorage.setItem(assetLibraryStorageKey, JSON.stringify(savedAssets));
+}
+
 function createPixelPreview(asset, index) {
   const cell = document.createElement('article');
   cell.className = 'asset-card';
-  cell.innerHTML = `
-    <div class="pixel-art" style="--asset-color:${asset.color};--asset-accent:${asset.accent}">
-      <span class="pixel-core"></span>
-      <span class="pixel-shine"></span>
-    </div>
-    <div>
-      <strong>${asset.name}</strong>
-      <p>${asset.type} / ${asset.width || 32}x${asset.height || 32} / v${index + 1}</p>
-    </div>
-  `;
+  const preview = document.createElement('div');
+  preview.className = 'pixel-art';
+  preview.style.setProperty('--asset-color', asset.color);
+  preview.style.setProperty('--asset-accent', asset.accent);
+
+  const core = document.createElement('span');
+  core.className = 'pixel-core';
+  const shine = document.createElement('span');
+  shine.className = 'pixel-shine';
+  preview.append(core, shine);
+
+  const details = document.createElement('div');
+  const title = document.createElement('strong');
+  title.textContent = asset.name;
+  const meta = document.createElement('p');
+  meta.textContent = `${asset.type} / ${asset.width || 32}x${asset.height || 32} / v${index + 1}`;
+  details.append(title, meta);
+
+  cell.append(preview, details);
   return cell;
 }
 
 function renderAssets() {
   assetGrid.replaceChildren(...generatedAssets.map(createPixelPreview));
+}
 
-  const listItems = generatedAssets.map((asset, index) => {
+function renderLibrary() {
+  const projectId = createGenerationRequest(project, getGeneratorValues()).projectId;
+  const visibleAssets = filterLibraryAssets(savedAssets, {
+    projectId,
+    type: activeLibraryFilter
+  });
+  const stats = getLibraryStats(savedAssets, projectId);
+
+  const listItems = visibleAssets.map((asset) => {
     const item = document.createElement('button');
     item.className = 'queue-item';
     item.type = 'button';
-    item.innerHTML = `
-      <span class="mini-swatch" style="background:${asset.color}"></span>
-      <span>
-        <strong>${asset.name}</strong>
-        <small>${asset.type} / ${asset.fileName || `${index + 1}.png`}</small>
-      </span>
-    `;
+    const swatch = document.createElement('span');
+    swatch.className = 'mini-swatch';
+    swatch.style.background = asset.color;
+    const copy = document.createElement('span');
+    const title = document.createElement('strong');
+    title.textContent = asset.name;
+    const meta = document.createElement('small');
+    meta.textContent = `${asset.type} / ${asset.fileName || asset.id}`;
+    copy.append(title, meta);
+    item.append(swatch, copy);
     return item;
   });
 
   assetList.replaceChildren(...listItems);
-  spriteCount.textContent = String(generatedAssets.length);
-  tileCount.textContent = String(generatedAssets.filter((asset) => asset.type === 'Tile').length || (project.tileSize === '32x32' ? 9 : 6));
+  libraryCount.textContent = `${stats.total} saved`;
+  spriteCount.textContent = String(stats.sprites || generatedAssets.length);
+  tileCount.textContent = String(stats.tiles || (project.tileSize === '32x32' ? 9 : 6));
+
+  if (!visibleAssets.length) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-state';
+    empty.textContent = 'No saved assets for this filter yet.';
+    assetList.replaceChildren(empty);
+  }
+}
+
+function renderLibraryFilters() {
+  const controls = libraryFilters.map((filter) => {
+    const button = document.createElement('button');
+    button.className = filter === activeLibraryFilter ? 'filter-pill active' : 'filter-pill';
+    button.type = 'button';
+    button.textContent = filter;
+    button.addEventListener('click', () => {
+      activeLibraryFilter = filter;
+      renderLibraryFilters();
+      renderLibrary();
+    });
+    return button;
+  });
+
+  libraryFiltersElement.replaceChildren(...controls);
 }
 
 function renderPaletteEditor() {
@@ -174,6 +246,7 @@ function renderProject() {
   sizeSelect.value = project.tileSize;
   renderPaletteEditor();
   renderAssets();
+  renderLibrary();
   renderRequestPreview();
 }
 
@@ -282,7 +355,10 @@ async function pollGenerationJob(jobId) {
 
   if (job.status === 'completed') {
     generatedAssets = job.result?.assets || [];
+    savedAssets = mergeLibraryAssets(savedAssets, createLibraryAssetsFromJob(job));
+    saveAssetLibrary();
     renderAssets();
+    renderLibrary();
     return;
   }
 
@@ -382,8 +458,17 @@ resetProjectButton.addEventListener('click', () => {
   renderProject();
 });
 
+clearLibraryButton.addEventListener('click', () => {
+  const projectId = createGenerationRequest(project, getGeneratorValues()).projectId;
+  savedAssets = savedAssets.filter((asset) => asset.projectId !== projectId);
+  saveAssetLibrary();
+  renderLibrary();
+});
+
 updateProjectForm();
 initializeGeneratorSchemaControls();
+renderLibraryFilters();
 renderProject();
 renderAssets();
+renderLibrary();
 renderJobStatus(activeJob);
