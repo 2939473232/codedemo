@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SpriteForge</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="brand-stage" aria-label="SpriteForge project identity">
+        <div class="brand-mark">SF</div>
+        <div class="brand-copy">
+          <p class="eyebrow">2D ASSET LAB</p>
+          <h1>SpriteForge</h1>
+          <p>Text driven assets for compact game teams.</p>
+        </div>
+        <button class="ornament-button" type="button">Start Demo</button>
+      </aside>
+
+      <main class="workspace">
+        <nav class="rail" aria-label="Primary">
+          <div class="rail-logo">S</div>
+          <button class="rail-item active" type="button" aria-label="Workspace">W</button>
+          <button class="rail-item" type="button" aria-label="Assets">A</button>
+          <button class="rail-item" type="button" aria-label="Tiles">T</button>
+          <button class="rail-item" type="button" aria-label="Exports">E</button>
+          <button class="rail-item" type="button" aria-label="Settings">G</button>
+        </nav>
+
+        <section class="console">
+          <header class="topbar">
+            <div>
+              <p class="section-kicker">WORKSPACE</p>
+              <h2>Forest Adventure</h2>
+            </div>
+            <div class="status-cluster" aria-label="Project summary">
+              <span>Godot</span>
+              <span>32x32</span>
+              <span class="pulse">Ready</span>
+            </div>
+          </header>
+
+          <div class="tabs" role="tablist" aria-label="Workspace sections">
+            <button class="tab active" type="button">Generate</button>
+            <button class="tab" type="button">Characters</button>
+            <button class="tab" type="button">Tiles</button>
+            <button class="tab" type="button">Library</button>
+            <button class="tab" type="button">Export</button>
+          </div>
+
+          <section class="hero-strip" aria-label="Project visual theme">
+            <div class="hero-fade">
+              <p>Style Preset</p>
+              <strong>Pixel Fantasy / Top-down / Teal Forest</strong>
+            </div>
+          </section>
+
+          <section class="content-grid">
+            <form class="generator-panel" id="generatorForm">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-kicker">GENERATOR</p>
+                  <h3>New Asset Request</h3>
+                </div>
+                <span class="chip">P0 Flow</span>
+              </div>
+
+              <label>
+                Asset Type
+                <select id="assetType" name="assetType">
+                  <option>Character</option>
+                  <option>Item</option>
+                  <option>Icon</option>
+                  <option>Tile</option>
+                </select>
+              </label>
+
+              <label>
+                Prompt
+                <textarea id="prompt" name="prompt" rows="4">red scarf knight with a short sword</textarea>
+              </label>
+
+              <div class="field-row">
+                <label>
+                  Size
+                  <select id="size" name="size">
+                    <option>32x32</option>
+                    <option>64x64</option>
+                    <option>128x128</option>
+                  </select>
+                </label>
+                <label>
+                  Count
+                  <select id="count" name="count">
+                    <option>4</option>
+                    <option>2</option>
+                    <option>8</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <label class="toggle">
+                  <input id="transparent" type="checkbox" checked />
+                  <span></span>
+                  Transparent
+                </label>
+                <label class="toggle">
+                  <input id="paletteLock" type="checkbox" checked />
+                  <span></span>
+                  Palette Lock
+                </label>
+              </div>
+
+              <button class="primary-action" type="submit">Generate Assets</button>
+            </form>
+
+            <section class="results-panel" aria-label="Generated assets">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-kicker">CANDIDATES</p>
+                  <h3>Generated Set</h3>
+                </div>
+                <span id="jobStatus" class="chip success">Idle</span>
+              </div>
+              <div class="asset-grid" id="assetGrid"></div>
+            </section>
+          </section>
+
+          <section class="bottom-grid" aria-label="Project assets and export status">
+            <div class="library-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-kicker">LIBRARY</p>
+                  <h3>Asset Queue</h3>
+                </div>
+              </div>
+              <div class="asset-list" id="assetList"></div>
+            </div>
+
+            <div class="export-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="section-kicker">EXPORT</p>
+                  <h3>Package Manifest</h3>
+                </div>
+              </div>
+              <dl class="manifest">
+                <div>
+                  <dt>Sprites</dt>
+                  <dd id="spriteCount">4</dd>
+                </div>
+                <div>
+                  <dt>Tiles</dt>
+                  <dd>9</dd>
+                </div>
+                <div>
+                  <dt>Format</dt>
+                  <dd>PNG + JSON</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="/src/app.js" type="module"></script>
+  </body>
+</html>

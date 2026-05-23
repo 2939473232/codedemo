@@ -1,0 +1,15 @@
+{
+  "name": "spriteforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A 2D game asset generation workspace for text-driven sprite, icon, tile, and export workflows.",
+  "type": "module",
+  "scripts": {
+    "dev": "node backend/server.js",
+    "start": "node backend/server.js",
+    "check": "node --check backend/server.js && node --check frontend/src/app.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
