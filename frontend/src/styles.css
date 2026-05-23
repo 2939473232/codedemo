@@ -893,6 +893,24 @@ textarea:focus {
   font-weight: 800;
 }
 
+.manifest-preview {
+  max-height: 178px;
+  margin: 14px 0 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+  background: #090c12;
+  color: #bceeff;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.ghost-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .empty-state {
   grid-column: 1 / -1;
   margin: 0;

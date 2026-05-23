@@ -265,8 +265,9 @@
               <div class="panel-heading">
                 <div>
                   <p class="section-kicker">EXPORT</p>
-                  <h3>Package Manifest</h3>
+                  <h3>Export Center</h3>
                 </div>
+                <button class="ghost-action" id="downloadManifestButton" type="button">Download JSON</button>
               </div>
               <dl class="manifest">
                 <div>
@@ -281,7 +282,12 @@
                   <dt>Engine</dt>
                   <dd id="manifestEngine">Godot</dd>
                 </div>
+                <div>
+                  <dt>Root</dt>
+                  <dd id="manifestRoot">res://spriteforge</dd>
+                </div>
               </dl>
+              <pre id="manifestPreview" class="manifest-preview"></pre>
             </div>
           </section>
         </section>

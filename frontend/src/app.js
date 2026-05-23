@@ -15,6 +15,7 @@ import {
   libraryFilters,
   mergeLibraryAssets
 } from './assetLibrary.js';
+import { createExportFileName, createExportManifest, downloadJsonFile } from './exportManifest.js';
 
 const assetGrid = document.querySelector('#assetGrid');
 const assetList = document.querySelector('#assetList');
@@ -46,6 +47,9 @@ const jobProgressValue = document.querySelector('#jobProgressValue');
 const libraryFiltersElement = document.querySelector('#libraryFilters');
 const libraryCount = document.querySelector('#libraryCount');
 const clearLibraryButton = document.querySelector('#clearLibraryButton');
+const downloadManifestButton = document.querySelector('#downloadManifestButton');
+const manifestPreview = document.querySelector('#manifestPreview');
+const manifestRoot = document.querySelector('#manifestRoot');
 
 const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
@@ -175,6 +179,7 @@ function renderLibrary() {
   libraryCount.textContent = `${stats.total} saved`;
   spriteCount.textContent = String(stats.sprites || generatedAssets.length);
   tileCount.textContent = String(stats.tiles || (project.tileSize === '32x32' ? 9 : 6));
+  renderExportCenter();
 
   if (!visibleAssets.length) {
     const empty = document.createElement('p');
@@ -182,6 +187,28 @@ function renderLibrary() {
     empty.textContent = 'No saved assets for this filter yet.';
     assetList.replaceChildren(empty);
   }
+}
+
+function getCurrentProjectId() {
+  return createGenerationRequest(project, getGeneratorValues()).projectId;
+}
+
+function getCurrentProjectAssets() {
+  return filterLibraryAssets(savedAssets, {
+    projectId: getCurrentProjectId(),
+    type: 'All'
+  });
+}
+
+function renderExportCenter() {
+  const manifest = createExportManifest(project, getCurrentProjectAssets(), {
+    projectId: getCurrentProjectId()
+  });
+
+  manifestEngine.textContent = manifest.project.targetEngine;
+  manifestRoot.textContent = manifest.project.targetEngine === 'Unity' ? 'Assets/SpriteForge' : 'res://spriteforge';
+  manifestPreview.textContent = JSON.stringify(manifest, null, 2);
+  downloadManifestButton.disabled = manifest.summary.total === 0;
 }
 
 function renderLibraryFilters() {
@@ -459,10 +486,17 @@ resetProjectButton.addEventListener('click', () => {
 });
 
 clearLibraryButton.addEventListener('click', () => {
-  const projectId = createGenerationRequest(project, getGeneratorValues()).projectId;
+  const projectId = getCurrentProjectId();
   savedAssets = savedAssets.filter((asset) => asset.projectId !== projectId);
   saveAssetLibrary();
   renderLibrary();
+});
+
+downloadManifestButton.addEventListener('click', () => {
+  const manifest = createExportManifest(project, getCurrentProjectAssets(), {
+    projectId: getCurrentProjectId()
+  });
+  downloadJsonFile(createExportFileName(project), manifest);
 });
 
 updateProjectForm();
@@ -471,4 +505,5 @@ renderLibraryFilters();
 renderProject();
 renderAssets();
 renderLibrary();
+renderExportCenter();
 renderJobStatus(activeJob);
