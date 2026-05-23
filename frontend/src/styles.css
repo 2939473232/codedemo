@@ -455,6 +455,7 @@ button {
 .library-panel,
 .export-panel,
 .animation-panel,
+.tileset-panel,
 .schema-panel {
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -638,7 +639,13 @@ textarea:focus {
   padding: 16px;
 }
 
-.animation-grid {
+.tileset-panel {
+  margin-top: 14px;
+  padding: 16px;
+}
+
+.animation-grid,
+.tileset-grid {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 14px;
@@ -659,17 +666,34 @@ textarea:focus {
   background-size: 20px 20px;
 }
 
-.animation-details {
+.tilemap-preview {
+  display: grid;
+  grid-template-columns: repeat(6, 28px);
+  grid-auto-rows: 28px;
+  align-content: center;
+  justify-content: center;
+  min-height: 190px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+  background: #090c12;
+}
+
+.animation-details,
+.tileset-details {
   display: grid;
   align-content: start;
   gap: 10px;
 }
 
-.animation-details strong {
+.animation-details strong,
+.tileset-details strong {
   font-size: 15px;
 }
 
-.animation-details p {
+.animation-details p,
+.tileset-details p {
   max-width: 680px;
   margin: 0;
   color: var(--muted);
@@ -681,6 +705,76 @@ textarea:focus {
   display: grid;
   grid-template-columns: repeat(8, 54px);
   gap: 8px;
+}
+
+.tile-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 42px);
+  gap: 8px;
+}
+
+.tile-cell {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--tile-accent);
+}
+
+.tile-cell.map {
+  width: 28px;
+  height: 28px;
+}
+
+.tile-cell.variant {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+}
+
+.tile-fill,
+.tile-detail {
+  position: absolute;
+  display: block;
+}
+
+.tile-fill {
+  inset: 4px;
+  background: var(--tile-color);
+}
+
+.tile-detail {
+  left: 25%;
+  right: 25%;
+  bottom: 18%;
+  height: 42%;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: var(--tile-accent);
+  opacity: 0.48;
+}
+
+.tile-cell[data-variant*="top"] .tile-fill {
+  top: 8px;
+}
+
+.tile-cell[data-variant*="bottom"] .tile-fill {
+  bottom: 8px;
+}
+
+.tile-cell[data-variant*="left"] .tile-fill {
+  left: 8px;
+}
+
+.tile-cell[data-variant*="right"] .tile-fill {
+  right: 8px;
+}
+
+.tile-cell[data-variant="center"] {
+  background: var(--tile-color);
+}
+
+.tile-cell[data-variant="center"] .tile-fill {
+  background: color-mix(in srgb, var(--tile-color) 88%, #0c1118);
 }
 
 .animation-frame {
@@ -1122,6 +1216,7 @@ textarea:focus {
   .project-config,
   .schema-grid,
   .animation-grid,
+  .tileset-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
   }
@@ -1135,5 +1230,9 @@ textarea:focus {
 
   .frame-strip {
     grid-template-columns: repeat(4, 54px);
+  }
+
+  .tile-variant-grid {
+    grid-template-columns: repeat(3, 42px);
   }
 }

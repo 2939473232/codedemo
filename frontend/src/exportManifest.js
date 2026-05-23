@@ -1,4 +1,5 @@
 import { getAnimatedAssets } from './spriteSheet.js';
+import { getTileAssets } from './tileSet.js';
 
 export function createExportManifest(project, assets, options = {}) {
   const createdAt = options.createdAt || new Date().toISOString();
@@ -7,6 +8,7 @@ export function createExportManifest(project, assets, options = {}) {
   const root = options.root || createExportRoot(engine);
   const files = assets.map((asset) => createManifestFile(asset, root));
   const animatedAssets = getAnimatedAssets(files);
+  const tileAssets = getTileAssets(files);
 
   return {
     manifestVersion: '2026-05-23.export.p0',
@@ -26,6 +28,7 @@ export function createExportManifest(project, assets, options = {}) {
       sprites: files.filter((file) => file.type !== '地块').length,
       tiles: files.filter((file) => file.type === '地块').length,
       animations: animatedAssets.length,
+      tileSets: tileAssets.length,
       formats: ['PNG', 'SVG 预览', 'JSON', 'ZIP']
     },
     directories: createDirectoryPlan(root),
@@ -36,6 +39,15 @@ export function createExportManifest(project, assets, options = {}) {
       actions: ['idle', 'walk'],
       path: `${root}/animations/${createAnimationBaseName(asset)}_spritesheet.svg`,
       metadataPath: `${root}/animations/${createAnimationBaseName(asset)}_frames.json`
+    })),
+    tileSets: tileAssets.map((asset) => ({
+      assetId: asset.id,
+      assetName: asset.name,
+      type: 'tileset',
+      layout: '3x3',
+      path: `${root}/tilesets/${createSafeBaseName(asset)}_tileset.svg`,
+      metadataPath: `${root}/tilesets/${createSafeBaseName(asset)}_tileset.json`,
+      previewPath: `${root}/tilesets/${createSafeBaseName(asset)}_preview.json`
     })),
     files
   };
@@ -80,6 +92,7 @@ function createDirectoryPlan(root) {
     ui: `${root}/ui`,
     effects: `${root}/effects`,
     animations: `${root}/animations`,
+    tileSets: `${root}/tilesets`,
     manifest: `${root}/manifest.json`
   };
 }
@@ -103,6 +116,10 @@ function createExportRoot(engine) {
 }
 
 function createAnimationBaseName(asset) {
+  return createSafeBaseName(asset);
+}
+
+function createSafeBaseName(asset) {
   return String(asset.fileName || getFileNameFromPath(asset.path) || asset.id || 'asset')
     .replace(/\.[a-z0-9]+$/i, '')
     .replace(/[^a-z0-9_-]+/gi, '_')

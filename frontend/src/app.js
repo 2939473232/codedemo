@@ -21,6 +21,7 @@ import {
 } from './assetLibrary.js';
 import { createExportFileName, createExportManifest, downloadJsonFile } from './exportManifest.js';
 import { createSpriteSheet, getAnimatedAssets } from './spriteSheet.js';
+import { createTileMapPreview, createTileSet, getTileAssets } from './tileSet.js';
 import { createExportPackageFiles, createZip, downloadZipFile } from './zipExport.js';
 
 const assetGrid = document.querySelector('#assetGrid');
@@ -63,6 +64,11 @@ const animationStatus = document.querySelector('#animationStatus');
 const animationTitle = document.querySelector('#animationTitle');
 const animationDescription = document.querySelector('#animationDescription');
 const frameStrip = document.querySelector('#frameStrip');
+const tileSetStatus = document.querySelector('#tileSetStatus');
+const tileSetTitle = document.querySelector('#tileSetTitle');
+const tileSetDescription = document.querySelector('#tileSetDescription');
+const tileMapPreview = document.querySelector('#tileMapPreview');
+const tileVariantGrid = document.querySelector('#tileVariantGrid');
 
 const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
@@ -234,6 +240,7 @@ function createPixelPreview(asset, index) {
 function renderAssets() {
   assetGrid.replaceChildren(...generatedAssets.map(createPixelPreview));
   renderAnimationPreview();
+  renderTileSetPreview();
 }
 
 function renderLibrary() {
@@ -365,6 +372,7 @@ function renderProject() {
   renderLibrary();
   renderRequestPreview();
   renderAnimationPreview();
+  renderTileSetPreview();
 }
 
 function renderAnimationPreview() {
@@ -428,6 +436,50 @@ function getFrameStepOffset(frame) {
 function formatFrameLabel(frame) {
   const actionLabel = frame.action === 'walk' ? '行走' : '待机';
   return `${actionLabel} ${frame.frame + 1}`;
+}
+
+function renderTileSetPreview() {
+  const [asset] = getTileAssets(generatedAssets);
+
+  if (!asset) {
+    tileSetStatus.textContent = '等待地块素材';
+    tileSetTitle.textContent = '暂无可预览地块';
+    tileSetDescription.textContent = '生成地块素材后，这里会自动展示九宫格 tile set 和地图拼接效果。';
+    tileMapPreview.replaceChildren(createTileSetEmptyState());
+    tileVariantGrid.replaceChildren();
+    return;
+  }
+
+  const tileSet = createTileSet(asset);
+  const preview = createTileMapPreview(asset);
+  tileSetStatus.textContent = `${tileSet.tiles.length} 个变体`;
+  tileSetTitle.textContent = `${asset.name} 九宫格地块`;
+  tileSetDescription.textContent = `${tileSet.tileWidth}x${tileSet.tileHeight} 单块，${tileSet.columns}x${tileSet.rows} tile set，可随 ZIP 导出 tileset JSON 和拼接预览。`;
+  tileMapPreview.replaceChildren(...preview.cells.map((cell) => createTileCell(asset, cell, 'map')));
+  tileVariantGrid.replaceChildren(...tileSet.tiles.map((tile) => createTileCell(asset, tile, 'variant')));
+}
+
+function createTileSetEmptyState() {
+  const empty = document.createElement('p');
+  empty.className = 'empty-state';
+  empty.textContent = '当前结果没有地块素材。';
+  return empty;
+}
+
+function createTileCell(asset, tile, mode) {
+  const cell = document.createElement('span');
+  cell.className = `tile-cell ${mode}`;
+  cell.title = tile.name || tile.variant;
+  cell.dataset.variant = tile.variant;
+  cell.style.setProperty('--tile-color', asset.color || '#72ef9b');
+  cell.style.setProperty('--tile-accent', asset.accent || '#2b6f4a');
+
+  const fill = document.createElement('i');
+  fill.className = 'tile-fill';
+  const detail = document.createElement('i');
+  detail.className = 'tile-detail';
+  cell.append(fill, detail);
+  return cell;
 }
 
 function titleCase(value) {
