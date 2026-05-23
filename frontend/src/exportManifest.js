@@ -22,7 +22,7 @@ export function createExportManifest(project, assets, options = {}) {
       total: files.length,
       sprites: files.filter((file) => file.type !== 'Tile').length,
       tiles: files.filter((file) => file.type === 'Tile').length,
-      formats: ['PNG', 'JSON']
+      formats: ['PNG', 'SVG_PREVIEW', 'JSON', 'ZIP']
     },
     directories: createDirectoryPlan(root),
     files

@@ -267,7 +267,10 @@
                   <p class="section-kicker">EXPORT</p>
                   <h3>Export Center</h3>
                 </div>
-                <button class="ghost-action" id="downloadManifestButton" type="button">Download JSON</button>
+                <div class="export-actions">
+                  <button class="ghost-action" id="downloadManifestButton" type="button">JSON</button>
+                  <button class="primary-action compact" id="downloadZipButton" type="button">ZIP</button>
+                </div>
               </div>
               <dl class="manifest">
                 <div>
@@ -285,6 +288,10 @@
                 <div>
                   <dt>Root</dt>
                   <dd id="manifestRoot">res://spriteforge</dd>
+                </div>
+                <div>
+                  <dt>Package</dt>
+                  <dd id="packageFileCount">0 files</dd>
                 </div>
               </dl>
               <pre id="manifestPreview" class="manifest-preview"></pre>

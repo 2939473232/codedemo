@@ -16,6 +16,7 @@ import {
   mergeLibraryAssets
 } from './assetLibrary.js';
 import { createExportFileName, createExportManifest, downloadJsonFile } from './exportManifest.js';
+import { createExportPackageFiles, createZip, downloadZipFile } from './zipExport.js';
 
 const assetGrid = document.querySelector('#assetGrid');
 const assetList = document.querySelector('#assetList');
@@ -48,8 +49,10 @@ const libraryFiltersElement = document.querySelector('#libraryFilters');
 const libraryCount = document.querySelector('#libraryCount');
 const clearLibraryButton = document.querySelector('#clearLibraryButton');
 const downloadManifestButton = document.querySelector('#downloadManifestButton');
+const downloadZipButton = document.querySelector('#downloadZipButton');
 const manifestPreview = document.querySelector('#manifestPreview');
 const manifestRoot = document.querySelector('#manifestRoot');
+const packageFileCount = document.querySelector('#packageFileCount');
 
 const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
@@ -204,11 +207,14 @@ function renderExportCenter() {
   const manifest = createExportManifest(project, getCurrentProjectAssets(), {
     projectId: getCurrentProjectId()
   });
+  const packageFiles = createExportPackageFiles(manifest);
 
   manifestEngine.textContent = manifest.project.targetEngine;
   manifestRoot.textContent = manifest.project.targetEngine === 'Unity' ? 'Assets/SpriteForge' : 'res://spriteforge';
   manifestPreview.textContent = JSON.stringify(manifest, null, 2);
+  packageFileCount.textContent = `${packageFiles.length} files`;
   downloadManifestButton.disabled = manifest.summary.total === 0;
+  downloadZipButton.disabled = manifest.summary.total === 0;
 }
 
 function renderLibraryFilters() {
@@ -497,6 +503,15 @@ downloadManifestButton.addEventListener('click', () => {
     projectId: getCurrentProjectId()
   });
   downloadJsonFile(createExportFileName(project), manifest);
+});
+
+downloadZipButton.addEventListener('click', () => {
+  const manifest = createExportManifest(project, getCurrentProjectAssets(), {
+    projectId: getCurrentProjectId()
+  });
+  const packageFiles = createExportPackageFiles(manifest);
+  const zipBytes = createZip(packageFiles);
+  downloadZipFile(createExportFileName(project).replace('_manifest.json', '_asset_package.zip'), zipBytes);
 });
 
 updateProjectForm();
