@@ -17,7 +17,7 @@ export function createGenerationJob(request) {
       ok: false,
       statusCode: 422,
       payload: {
-        error: 'Invalid generation request',
+        error: '生成请求无效',
         details: validation.errors
       }
     };
@@ -52,7 +52,7 @@ export function getGenerationJob(jobId) {
     return {
       ok: false,
       statusCode: 404,
-      payload: { error: 'Generation job not found' }
+      payload: { error: '生成任务不存在' }
     };
   }
 
@@ -96,7 +96,7 @@ function buildJobResult(job) {
     assetType: request.assetType,
     style: request.style.artStyle,
     engine: request.target.engine,
-    exportHint: `${request.target.engine} ready ${request.size} PNG sequence`,
+    exportHint: `${request.target.engine} 可用的 ${request.size} PNG 序列`,
     previewSeed: `${request.projectId}:${request.assetType}:${request.description}`,
     assets,
     manifest: createFallbackManifest(request, assets)

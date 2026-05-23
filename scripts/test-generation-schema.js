@@ -5,25 +5,25 @@ import {
 } from '../shared/generationSchema.js';
 
 const project = {
-  name: 'Forest Adventure',
-  gameType: 'Top-down RPG',
+  name: '森林冒险',
+  gameType: '俯视角 RPG',
   targetEngine: 'Godot',
   tileSize: '32x32',
-  artStyle: 'Pixel Fantasy',
-  cameraView: 'Top-down',
+  artStyle: '像素奇幻',
+  cameraView: '俯视角',
   palette: ['#35d0ff', '#ff4d6d', '#ffd166']
 };
 
 const request = createGenerationRequest(project, {
-  assetType: 'Character',
-  description: 'red scarf knight with a short sword',
+  assetType: '角色',
+  description: '戴红色围巾的短剑骑士',
   size: '32x32',
   count: '4',
   transparentBackground: true,
   paletteLock: true,
-  outlineMode: 'Medium',
-  colorMode: 'Project Palette',
-  intendedUse: 'Player Character'
+  outlineMode: '中描边',
+  colorMode: '项目调色板',
+  intendedUse: '玩家角色'
 });
 
 const result = validateGenerationRequest(request);

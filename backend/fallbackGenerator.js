@@ -45,7 +45,7 @@ export function createFallbackManifest(request, assets) {
     files: assets.map((asset) => ({
       id: asset.id,
       name: asset.name,
-      path: `assets/${request.projectId}/${asset.type.toLowerCase()}/${asset.fileName}`,
+      path: `assets/${request.projectId}/${getAssetDirectory(asset.type)}/${asset.fileName}`,
       width: asset.width,
       height: asset.height,
       type: asset.type,
@@ -59,12 +59,26 @@ function normalizePalette(palette) {
 }
 
 function toAssetName(description) {
-  return String(description || 'generated asset')
+  return String(description || '生成素材')
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 6)
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
+}
+
+function getAssetDirectory(type) {
+  const directories = {
+    角色: 'sprites',
+    敌人: 'sprites',
+    道具: 'icons',
+    图标: 'icons',
+    地块: 'tiles',
+    界面元素: 'ui',
+    特效: 'effects'
+  };
+
+  return directories[type] || 'sprites';
 }
 
 function slugify(value) {

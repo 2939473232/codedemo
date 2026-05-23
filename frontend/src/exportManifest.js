@@ -20,9 +20,9 @@ export function createExportManifest(project, assets, options = {}) {
     },
     summary: {
       total: files.length,
-      sprites: files.filter((file) => file.type !== 'Tile').length,
-      tiles: files.filter((file) => file.type === 'Tile').length,
-      formats: ['PNG', 'SVG_PREVIEW', 'JSON', 'ZIP']
+      sprites: files.filter((file) => file.type !== '地块').length,
+      tiles: files.filter((file) => file.type === '地块').length,
+      formats: ['PNG', 'SVG 预览', 'JSON', 'ZIP']
     },
     directories: createDirectoryPlan(root),
     files
@@ -73,13 +73,13 @@ function createDirectoryPlan(root) {
 
 function getAssetDirectory(type) {
   const directories = {
-    Character: 'sprites',
-    Enemy: 'sprites',
-    Item: 'icons',
-    Icon: 'icons',
-    Tile: 'tiles',
-    UI: 'ui',
-    Effect: 'effects'
+    角色: 'sprites',
+    敌人: 'sprites',
+    道具: 'icons',
+    图标: 'icons',
+    地块: 'tiles',
+    界面元素: 'ui',
+    特效: 'effects'
   };
 
   return directories[type] || 'sprites';
@@ -90,10 +90,24 @@ function createExportRoot(engine) {
 }
 
 function createProjectId(name) {
-  return String(name || 'untitled-project')
+  const trimmedName = String(name || '').trim();
+  const namedSlugs = {
+    森林冒险: 'forest-adventure',
+    未命名素材包: 'untitled-asset-pack'
+  };
+
+  if (!trimmedName) {
+    return 'untitled-project';
+  }
+
+  if (namedSlugs[trimmedName]) {
+    return namedSlugs[trimmedName];
+  }
+
+  return trimmedName
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    .slice(0, 48) || 'untitled-project';
+    .slice(0, 48) || 'spriteforge-project';
 }

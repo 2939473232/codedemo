@@ -1,36 +1,36 @@
 import { createExportFileName, createExportManifest } from '../frontend/src/exportManifest.js';
 
 const project = {
-  name: 'Forest Adventure',
-  gameType: 'Top-down RPG',
+  name: '森林冒险',
+  gameType: '俯视角 RPG',
   targetEngine: 'Godot',
   tileSize: '32x32',
-  artStyle: 'Pixel Fantasy',
-  cameraView: 'Top-down',
+  artStyle: '像素奇幻',
+  cameraView: '俯视角',
   palette: ['#35d0ff', '#ff4d6d']
 };
 
 const assets = [
   {
     id: 'asset_1',
-    name: 'Knight',
-    type: 'Character',
+    name: '骑士',
+    type: '角色',
     fileName: 'knight_32x32.png',
     width: 32,
     height: 32,
     transparentBackground: true,
-    tags: ['Character'],
+    tags: ['角色'],
     metadata: { fallback: true }
   },
   {
     id: 'asset_2',
-    name: 'Grass',
-    type: 'Tile',
+    name: '草地',
+    type: '地块',
     fileName: 'grass_32x32.png',
     width: 32,
     height: 32,
     transparentBackground: true,
-    tags: ['Tile'],
+    tags: ['地块'],
     metadata: { fallback: true }
   }
 ];

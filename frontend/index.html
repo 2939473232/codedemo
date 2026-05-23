@@ -8,85 +8,85 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="brand-stage" aria-label="SpriteForge project identity">
+      <aside class="brand-stage" aria-label="SpriteForge 项目标识">
         <div class="brand-mark">SF</div>
         <div class="brand-copy">
-          <p class="eyebrow">2D ASSET LAB</p>
+          <p class="eyebrow">2D 素材工坊</p>
           <h1>SpriteForge</h1>
-          <p>Text driven assets for compact game teams.</p>
+          <p>面向小型游戏团队的文本驱动素材工作台。</p>
         </div>
-        <button class="ornament-button" type="button">Start Demo</button>
+        <button class="ornament-button" type="button">开始演示</button>
       </aside>
 
       <main class="workspace">
-        <nav class="rail" aria-label="Primary">
+        <nav class="rail" aria-label="主导航">
           <div class="rail-logo">S</div>
-          <button class="rail-item active" type="button" aria-label="Workspace">W</button>
-          <button class="rail-item" type="button" aria-label="Assets">A</button>
-          <button class="rail-item" type="button" aria-label="Tiles">T</button>
-          <button class="rail-item" type="button" aria-label="Exports">E</button>
-          <button class="rail-item" type="button" aria-label="Settings">G</button>
+          <button class="rail-item active" type="button" aria-label="工作台">工</button>
+          <button class="rail-item" type="button" aria-label="素材">素</button>
+          <button class="rail-item" type="button" aria-label="地块">块</button>
+          <button class="rail-item" type="button" aria-label="导出">出</button>
+          <button class="rail-item" type="button" aria-label="设置">设</button>
         </nav>
 
         <section class="console">
           <header class="topbar">
             <div>
-              <p class="section-kicker">WORKSPACE</p>
-              <h2 id="projectTitle">Forest Adventure</h2>
+              <p class="section-kicker">工作台</p>
+              <h2 id="projectTitle">森林冒险</h2>
             </div>
             <div class="topbar-actions">
-              <div class="status-cluster" aria-label="Project summary">
+              <div class="status-cluster" aria-label="项目摘要">
                 <span id="engineBadge">Godot</span>
                 <span id="sizeBadge">32x32</span>
-                <span id="styleBadge">Pixel Fantasy</span>
+                <span id="styleBadge">像素奇幻</span>
               </div>
-              <button class="ghost-action" id="newProjectButton" type="button">New Project</button>
-              <span class="chip success">Ready</span>
+              <button class="ghost-action" id="newProjectButton" type="button">新建项目</button>
+              <span class="chip success">就绪</span>
             </div>
           </header>
 
-          <div class="tabs" role="tablist" aria-label="Workspace sections">
-            <button class="tab active" type="button">Generate</button>
-            <button class="tab" type="button">Characters</button>
-            <button class="tab" type="button">Tiles</button>
-            <button class="tab" type="button">Library</button>
-            <button class="tab" type="button">Export</button>
+          <div class="tabs" role="tablist" aria-label="工作区分区">
+            <button class="tab active" type="button">生成</button>
+            <button class="tab" type="button">角色</button>
+            <button class="tab" type="button">地块</button>
+            <button class="tab" type="button">素材库</button>
+            <button class="tab" type="button">导出</button>
           </div>
 
-          <section class="hero-strip" aria-label="Project visual theme">
+          <section class="hero-strip" aria-label="项目视觉主题">
             <div class="hero-fade">
-              <p>Style Preset</p>
-              <strong id="styleSummary">Pixel Fantasy / Top-down / Teal Forest</strong>
+              <p>风格预设</p>
+              <strong id="styleSummary">像素奇幻 / 俯视角 / 森林冒险</strong>
             </div>
-            <div class="palette-strip" id="paletteStrip" aria-label="Project palette"></div>
+            <div class="palette-strip" id="paletteStrip" aria-label="项目调色板"></div>
           </section>
 
-          <section class="project-config" aria-label="Project and style configuration">
+          <section class="project-config" aria-label="项目与风格配置">
             <form class="config-panel" id="projectForm">
               <div class="panel-heading">
                 <div>
-                  <p class="section-kicker">PROJECT</p>
-                  <h3>Project Setup</h3>
+                  <p class="section-kicker">项目</p>
+                  <h3>项目设置</h3>
                 </div>
-                <span class="chip">Auto Saved</span>
+                <span class="chip">自动保存</span>
               </div>
 
               <div class="config-grid">
                 <label>
-                  Project Name
+                  项目名称
                   <input id="projectName" name="name" type="text" maxlength="32" required />
                 </label>
                 <label>
-                  Game Type
+                  游戏类型
                   <select id="gameType" name="gameType">
-                    <option value="Top-down RPG">Top-down RPG</option>
-                    <option value="Platformer">Platformer</option>
+                    <option value="俯视角 RPG">俯视角 RPG</option>
+                    <option value="平台跳跃">平台跳跃</option>
                     <option value="Roguelike">Roguelike</option>
-                    <option value="Card Battler">Card Battler</option>
+                    <option value="卡牌战斗">卡牌战斗</option>
                   </select>
                 </label>
                 <label>
-                  Target Engine
+                  目标引擎
                   <select id="targetEngine" name="targetEngine">
                     <option value="Godot">Godot</option>
                     <option value="Unity">Unity</option>
@@ -95,7 +95,7 @@
                   </select>
                 </label>
                 <label>
-                  Tile Size
+                  地块尺寸
                   <select id="tileSize" name="tileSize">
                     <option value="16x16">16x16</option>
                     <option value="32x32">32x32</option>
@@ -104,41 +104,41 @@
                   </select>
                 </label>
                 <label>
-                  Art Style
+                  美术风格
                   <select id="artStyle" name="artStyle">
-                    <option value="Pixel Fantasy">Pixel Fantasy</option>
-                    <option value="Hand Painted">Hand Painted</option>
-                    <option value="Cyber Neon">Cyber Neon</option>
-                    <option value="Dark Gothic">Dark Gothic</option>
-                    <option value="Cute Chibi">Cute Chibi</option>
+                    <option value="像素奇幻">像素奇幻</option>
+                    <option value="手绘卡通">手绘卡通</option>
+                    <option value="赛博霓虹">赛博霓虹</option>
+                    <option value="暗黑哥特">暗黑哥特</option>
+                    <option value="Q 版可爱">Q 版可爱</option>
                   </select>
                 </label>
                 <label>
-                  Camera View
+                  画面视角
                   <select id="cameraView" name="cameraView">
-                    <option value="Top-down">Top-down</option>
-                    <option value="Side View">Side View</option>
-                    <option value="Isometric">Isometric</option>
-                    <option value="Icon Front">Icon Front</option>
+                    <option value="俯视角">俯视角</option>
+                    <option value="侧视角">侧视角</option>
+                    <option value="等距视角">等距视角</option>
+                    <option value="图标正面">图标正面</option>
                   </select>
                 </label>
               </div>
 
-              <div class="palette-editor" id="paletteEditor" aria-label="Palette editor"></div>
+              <div class="palette-editor" id="paletteEditor" aria-label="调色板编辑器"></div>
 
               <div class="form-actions">
-                <button class="primary-action compact" type="submit">Save Project</button>
-                <button class="ghost-action" id="resetProjectButton" type="button">Reset Demo</button>
+                <button class="primary-action compact" type="submit">保存项目</button>
+                <button class="ghost-action" id="resetProjectButton" type="button">重置演示</button>
               </div>
             </form>
 
-            <aside class="style-card" aria-label="Style inheritance preview">
-              <p class="section-kicker">STYLE LOCK</p>
-              <h3 id="styleLockTitle">Pixel Fantasy Pack</h3>
-              <p id="styleLockDescription">Generation requests inherit project engine, view, tile size, palette, and style language.</p>
+            <aside class="style-card" aria-label="风格继承预览">
+              <p class="section-kicker">风格锁定</p>
+              <h3 id="styleLockTitle">像素奇幻素材包</h3>
+              <p id="styleLockDescription">生成请求会继承项目引擎、视角、地块尺寸、调色板和风格描述。</p>
               <div class="style-metrics">
-                <span><strong id="assetTypeCount">4</strong> asset types</span>
-                <span><strong id="paletteCount">6</strong> colors</span>
+                <span><strong id="assetTypeCount">4</strong> 类素材</span>
+                <span><strong id="paletteCount">6</strong> 个颜色</span>
               </div>
             </aside>
           </section>
@@ -147,31 +147,31 @@
             <form class="generator-panel" id="generatorForm">
               <div class="panel-heading">
                 <div>
-                  <p class="section-kicker">GENERATOR</p>
-                  <h3>New Asset Request</h3>
+                  <p class="section-kicker">生成器</p>
+                  <h3>新素材请求</h3>
                 </div>
-                <span class="chip">P0 Flow</span>
+                <span class="chip">P0 流程</span>
               </div>
 
               <label>
-                Asset Type
+                素材类型
                 <select id="assetType" name="assetType">
                 </select>
               </label>
 
               <label>
-                Prompt
-                <textarea id="prompt" name="description" rows="4">red scarf knight with a short sword</textarea>
+                文本描述
+                <textarea id="prompt" name="description" rows="4">戴红色围巾的短剑骑士</textarea>
               </label>
 
               <div class="field-row">
                 <label>
-                  Size
+                  尺寸
                   <select id="size" name="size">
                   </select>
                 </label>
                 <label>
-                  Count
+                  数量
                   <select id="count" name="count">
                   </select>
                 </label>
@@ -179,17 +179,17 @@
 
               <div class="field-row">
                 <label>
-                  Outline
+                  描边
                   <select id="outlineMode" name="outlineMode"></select>
                 </label>
                 <label>
-                  Color Mode
+                  配色模式
                   <select id="colorMode" name="colorMode"></select>
                 </label>
               </div>
 
               <label>
-                Intended Use
+                用途
                 <select id="intendedUse" name="intendedUse"></select>
               </label>
 
@@ -197,46 +197,46 @@
                 <label class="toggle">
                   <input id="transparent" type="checkbox" checked />
                   <span></span>
-                  Transparent
+                  透明背景
                 </label>
                 <label class="toggle">
                   <input id="paletteLock" type="checkbox" checked />
                   <span></span>
-                  Palette Lock
+                  锁定调色板
                 </label>
               </div>
 
-              <button class="primary-action" type="submit">Generate Assets</button>
+              <button class="primary-action" type="submit">生成素材</button>
             </form>
 
-            <section class="results-panel" aria-label="Generated assets">
+            <section class="results-panel" aria-label="生成素材">
               <div class="panel-heading">
                 <div>
-                  <p class="section-kicker">CANDIDATES</p>
-                  <h3>Generated Set</h3>
+                  <p class="section-kicker">候选结果</p>
+                  <h3>生成结果</h3>
                 </div>
-                <span id="jobStatus" class="chip success">Idle</span>
+                <span id="jobStatus" class="chip success">空闲</span>
               </div>
               <div class="asset-grid" id="assetGrid"></div>
             </section>
           </section>
 
-          <section class="schema-panel" aria-label="Generation request schema preview">
+          <section class="schema-panel" aria-label="生成请求结构预览">
             <div class="panel-heading">
               <div>
-                <p class="section-kicker">SCHEMA</p>
-                <h3>GenerationRequest Preview</h3>
+                <p class="section-kicker">结构</p>
+                <h3>生成请求预览</h3>
               </div>
-              <span class="chip">Shared Contract</span>
+              <span class="chip">共享契约</span>
             </div>
             <div class="schema-grid">
               <pre id="requestPreview" class="request-preview"></pre>
               <div class="job-column">
                 <ul id="validationList" class="validation-list"></ul>
                 <div class="job-status-card">
-                  <p class="section-kicker">JOB</p>
-                  <strong id="activeJobId">No active job</strong>
-                  <div class="progress-track" aria-label="Generation job progress">
+                  <p class="section-kicker">任务</p>
+                  <strong id="activeJobId">暂无任务</strong>
+                  <div class="progress-track" aria-label="生成任务进度">
                     <span id="jobProgressBar"></span>
                   </div>
                   <small id="jobProgressValue">0%</small>
@@ -245,18 +245,18 @@
             </div>
           </section>
 
-          <section class="bottom-grid" aria-label="Project assets and export status">
+          <section class="bottom-grid" aria-label="项目素材与导出状态">
             <div class="library-panel">
               <div class="panel-heading">
                 <div>
-                  <p class="section-kicker">LIBRARY</p>
-                  <h3>Asset Library</h3>
+                  <p class="section-kicker">素材库</p>
+                  <h3>素材库</h3>
                 </div>
-                <span class="chip" id="libraryCount">0 saved</span>
+                <span class="chip" id="libraryCount">已保存 0</span>
               </div>
               <div class="library-toolbar">
-                <div class="filter-pills" id="libraryFilters" aria-label="Asset library filters"></div>
-                <button class="ghost-action" id="clearLibraryButton" type="button">Clear Project</button>
+                <div class="filter-pills" id="libraryFilters" aria-label="素材库筛选"></div>
+                <button class="ghost-action" id="clearLibraryButton" type="button">清空当前项目</button>
               </div>
               <div class="asset-list" id="assetList"></div>
             </div>
@@ -264,8 +264,8 @@
             <div class="export-panel">
               <div class="panel-heading">
                 <div>
-                  <p class="section-kicker">EXPORT</p>
-                  <h3>Export Center</h3>
+                  <p class="section-kicker">导出</p>
+                  <h3>导出中心</h3>
                 </div>
                 <div class="export-actions">
                   <button class="ghost-action" id="downloadManifestButton" type="button">JSON</button>
@@ -274,24 +274,24 @@
               </div>
               <dl class="manifest">
                 <div>
-                  <dt>Sprites</dt>
+                  <dt>精灵</dt>
                   <dd id="spriteCount">4</dd>
                 </div>
                 <div>
-                  <dt>Tiles</dt>
+                  <dt>地块</dt>
                   <dd id="tileCount">9</dd>
                 </div>
                 <div>
-                  <dt>Engine</dt>
+                  <dt>引擎</dt>
                   <dd id="manifestEngine">Godot</dd>
                 </div>
                 <div>
-                  <dt>Root</dt>
+                  <dt>根目录</dt>
                   <dd id="manifestRoot">res://spriteforge</dd>
                 </div>
                 <div>
-                  <dt>Package</dt>
-                  <dd id="packageFileCount">0 files</dd>
+                  <dt>资源包</dt>
+                  <dd id="packageFileCount">0 个文件</dd>
                 </div>
               </dl>
               <pre id="manifestPreview" class="manifest-preview"></pre>

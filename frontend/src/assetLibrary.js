@@ -1,4 +1,4 @@
-export const libraryFilters = ['All', 'Character', 'Enemy', 'Item', 'Icon', 'Tile', 'UI', 'Effect'];
+export const libraryFilters = ['全部', '角色', '敌人', '道具', '图标', '地块', '界面元素', '特效'];
 
 export function createLibraryAssetsFromJob(job) {
   if (!job?.result?.assets || !job?.request) {
@@ -23,16 +23,16 @@ export function mergeLibraryAssets(existingAssets, incomingAssets) {
   return [...incomingAssets, ...retainedAssets];
 }
 
-export function filterLibraryAssets(assets, { projectId, type = 'All' }) {
+export function filterLibraryAssets(assets, { projectId, type = '全部' }) {
   return assets.filter((asset) => {
     const matchesProject = asset.projectId === projectId;
-    const matchesType = type === 'All' || asset.type === type;
+    const matchesType = type === '全部' || asset.type === type;
     return matchesProject && matchesType;
   });
 }
 
 export function getLibraryStats(assets, projectId) {
-  const projectAssets = filterLibraryAssets(assets, { projectId, type: 'All' });
+  const projectAssets = filterLibraryAssets(assets, { projectId, type: '全部' });
   const byType = projectAssets.reduce((counts, asset) => {
     counts[asset.type] = (counts[asset.type] || 0) + 1;
     return counts;
@@ -40,8 +40,8 @@ export function getLibraryStats(assets, projectId) {
 
   return {
     total: projectAssets.length,
-    sprites: projectAssets.filter((asset) => asset.type !== 'Tile').length,
-    tiles: byType.Tile || 0,
+    sprites: projectAssets.filter((asset) => asset.type !== '地块').length,
+    tiles: byType.地块 || 0,
     byType
   };
 }

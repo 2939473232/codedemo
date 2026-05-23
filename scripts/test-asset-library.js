@@ -11,14 +11,14 @@ const job = {
   updatedAt: '2026-05-23T00:00:01.000Z',
   request: {
     projectId: 'forest-adventure',
-    projectName: 'Forest Adventure',
-    intendedUse: 'Player Character',
-    style: { artStyle: 'Pixel Fantasy' }
+    projectName: '森林冒险',
+    intendedUse: '玩家角色',
+    style: { artStyle: '像素奇幻' }
   },
   result: {
     assets: [
-      { id: 'asset_1', name: 'Knight', type: 'Character' },
-      { id: 'asset_2', name: 'Grass', type: 'Tile' }
+      { id: 'asset_1', name: '骑士', type: '角色' },
+      { id: 'asset_2', name: '草地', type: '地块' }
     ]
   }
 };
@@ -28,11 +28,11 @@ assert(assets.length === 2, 'Expected assets from completed job');
 assert(assets[0].projectId === 'forest-adventure', 'Expected project id on library asset');
 assert(assets[0].sourceJobId === 'job_demo', 'Expected source job id on library asset');
 
-const merged = mergeLibraryAssets([{ id: 'asset_1', name: 'Old Knight', type: 'Character' }], assets);
+const merged = mergeLibraryAssets([{ id: 'asset_1', name: '旧骑士', type: '角色' }], assets);
 assert(merged.length === 2, 'Expected merge to replace duplicate ids');
-assert(merged[0].name === 'Knight', 'Expected incoming asset to win duplicate merge');
+assert(merged[0].name === '骑士', 'Expected incoming asset to win duplicate merge');
 
-const filtered = filterLibraryAssets(merged, { projectId: 'forest-adventure', type: 'Tile' });
+const filtered = filterLibraryAssets(merged, { projectId: 'forest-adventure', type: '地块' });
 assert(filtered.length === 1, 'Expected type filter to work');
 
 const stats = getLibraryStats(merged, 'forest-adventure');

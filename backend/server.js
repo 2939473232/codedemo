@@ -24,12 +24,12 @@ const mimeTypes = {
 
 const demoProject = {
   id: 'forest-adventure',
-  name: 'Forest Adventure',
+  name: '森林冒险',
   targetEngine: 'Godot',
-  style: '32x32 Pixel Fantasy',
-  view: 'Top-down',
-  assetTypes: ['Character', 'Item', 'Icon', 'Tile'],
-  status: 'Prototype'
+  style: '32x32 像素奇幻',
+  view: '俯视角',
+  assetTypes: ['角色', '道具', '图标', '地块'],
+  status: '原型'
 };
 
 function sendJson(response, statusCode, payload) {
@@ -65,7 +65,7 @@ async function serveStatic(request, response) {
   const filePath = join(staticDir, decodeURIComponent(staticPathname));
 
   if (!isPathInside(staticDir, filePath)) {
-    sendJson(response, 403, { error: 'Forbidden' });
+    sendJson(response, 403, { error: '禁止访问该路径' });
     return;
   }
 
@@ -76,7 +76,7 @@ async function serveStatic(request, response) {
     createReadStream(filePath).pipe(response);
   } catch {
     if (isSharedModule) {
-      sendJson(response, 404, { error: 'Not found' });
+      sendJson(response, 404, { error: '资源不存在' });
       return;
     }
 
@@ -118,7 +118,7 @@ const server = createServer(async (request, response) => {
       const result = createGenerationJob(payload);
       sendJson(response, result.statusCode, result.payload);
     } catch {
-      sendJson(response, 400, { error: 'Request body must be valid JSON' });
+      sendJson(response, 400, { error: '请求体必须是有效 JSON' });
     }
     return;
   }

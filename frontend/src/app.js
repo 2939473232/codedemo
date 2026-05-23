@@ -1,11 +1,15 @@
 import {
+  artStyles,
   assetTypes,
   assetSizes,
+  cameraViews,
   colorModes,
   createGenerationRequest,
+  gameTypes,
   generationCounts,
   intendedUses,
   outlineModes,
+  targetEngines,
   validateGenerationRequest
 } from '../../shared/generationSchema.js';
 import {
@@ -58,33 +62,70 @@ const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
 
 const defaultPalette = ['#35d0ff', '#ff4d6d', '#ffd166', '#72ef9b', '#b8f7ff', '#f49f4d'];
-const defaultAssetTypes = ['Character', 'Item', 'Icon', 'Tile'];
+const defaultAssetTypes = ['角色', '道具', '图标', '地块'];
+const legacyLabelMap = {
+  'Forest Adventure': '森林冒险',
+  'Untitled Asset Pack': '未命名素材包',
+  'Top-down RPG': '俯视角 RPG',
+  Platformer: '平台跳跃',
+  'Card Battler': '卡牌战斗',
+  'Pixel Fantasy': '像素奇幻',
+  'Hand Painted': '手绘卡通',
+  'Cyber Neon': '赛博霓虹',
+  'Dark Gothic': '暗黑哥特',
+  'Cute Chibi': 'Q 版可爱',
+  'Top-down': '俯视角',
+  'Side View': '侧视角',
+  Isometric: '等距视角',
+  'Icon Front': '图标正面',
+  Character: '角色',
+  Enemy: '敌人',
+  Item: '道具',
+  Icon: '图标',
+  Tile: '地块',
+  UI: '界面元素',
+  Effect: '特效',
+  All: '全部',
+  None: '无',
+  Light: '轻描边',
+  Medium: '中描边',
+  Bold: '粗描边',
+  'Project Palette': '项目调色板',
+  'Free Palette': '自由配色',
+  Monochrome: '单色',
+  'Player Character': '玩家角色',
+  'Enemy Sprite': '敌人精灵',
+  'Inventory Icon': '背包图标',
+  'Map Tile': '地图地块',
+  'UI Element': '界面元素',
+  'Effect Frame': '特效帧'
+};
 
 function createDefaultProject() {
   return {
-    name: 'Forest Adventure',
-    gameType: 'Top-down RPG',
+    name: '森林冒险',
+    gameType: '俯视角 RPG',
     targetEngine: 'Godot',
     tileSize: '32x32',
-    artStyle: 'Pixel Fantasy',
-    cameraView: 'Top-down',
+    artStyle: '像素奇幻',
+    cameraView: '俯视角',
     palette: [...defaultPalette],
     assetTypes: [...defaultAssetTypes]
   };
 }
 
 const seedAssets = [
-  { name: 'Red Scarf Knight', type: 'Character', fileName: 'red_scarf_knight_32x32.png', color: '#35d0ff', accent: '#ff4d6d' },
-  { name: 'Iron Sword', type: 'Item', fileName: 'iron_sword_32x32.png', color: '#b8f7ff', accent: '#ffd166' },
-  { name: 'Health Potion', type: 'Icon', fileName: 'health_potion_32x32.png', color: '#ff4d6d', accent: '#72ef9b' },
-  { name: 'Forest Tile', type: 'Tile', fileName: 'forest_tile_32x32.png', color: '#72ef9b', accent: '#2b6f4a' }
+  { name: '红围巾骑士', type: '角色', fileName: 'red_scarf_knight_32x32.png', color: '#35d0ff', accent: '#ff4d6d' },
+  { name: '铁剑', type: '道具', fileName: 'iron_sword_32x32.png', color: '#b8f7ff', accent: '#ffd166' },
+  { name: '治疗药水', type: '图标', fileName: 'health_potion_32x32.png', color: '#ff4d6d', accent: '#72ef9b' },
+  { name: '森林地块', type: '地块', fileName: 'forest_tile_32x32.png', color: '#72ef9b', accent: '#2b6f4a' }
 ];
 
 let project = loadProject();
 let generatedAssets = [...seedAssets];
 let activeJob = null;
 let savedAssets = loadSavedAssets();
-let activeLibraryFilter = 'All';
+let activeLibraryFilter = '全部';
 
 function loadProject() {
   const fallbackProject = createDefaultProject();
@@ -96,15 +137,28 @@ function loadProject() {
     }
 
     const parsedProject = JSON.parse(storedProject);
-    return {
+    return localizeLegacyProject({
       ...fallbackProject,
       ...parsedProject,
       palette: Array.isArray(parsedProject.palette) ? parsedProject.palette : fallbackProject.palette,
       assetTypes: Array.isArray(parsedProject.assetTypes) ? parsedProject.assetTypes : fallbackProject.assetTypes
-    };
+    });
   } catch {
     return fallbackProject;
   }
+}
+
+function localizeLegacyProject(candidateProject) {
+  return {
+    ...candidateProject,
+    name: localizeLegacyValue(candidateProject.name),
+    gameType: localizeLegacyValue(candidateProject.gameType),
+    artStyle: localizeLegacyValue(candidateProject.artStyle),
+    cameraView: localizeLegacyValue(candidateProject.cameraView),
+    assetTypes: Array.isArray(candidateProject.assetTypes)
+      ? candidateProject.assetTypes.map(localizeLegacyValue)
+      : [...defaultAssetTypes]
+  };
 }
 
 function saveProject() {
@@ -114,10 +168,32 @@ function saveProject() {
 function loadSavedAssets() {
   try {
     const storedAssets = window.localStorage.getItem(assetLibraryStorageKey);
-    return storedAssets ? JSON.parse(storedAssets) : [];
+    const parsedAssets = storedAssets ? JSON.parse(storedAssets) : [];
+    return Array.isArray(parsedAssets) ? parsedAssets.map(localizeLegacyAsset) : [];
   } catch {
     return [];
   }
+}
+
+function localizeLegacyAsset(asset) {
+  return {
+    ...asset,
+    type: localizeLegacyValue(asset.type),
+    projectName: localizeLegacyValue(asset.projectName),
+    tags: Array.isArray(asset.tags) ? asset.tags.map(localizeLegacyValue) : asset.tags,
+    metadata: asset.metadata
+      ? {
+          ...asset.metadata,
+          outlineMode: localizeLegacyValue(asset.metadata.outlineMode),
+          colorMode: localizeLegacyValue(asset.metadata.colorMode),
+          intendedUse: localizeLegacyValue(asset.metadata.intendedUse)
+        }
+      : asset.metadata
+  };
+}
+
+function localizeLegacyValue(value) {
+  return legacyLabelMap[value] || value;
 }
 
 function saveAssetLibrary() {
@@ -179,7 +255,7 @@ function renderLibrary() {
   });
 
   assetList.replaceChildren(...listItems);
-  libraryCount.textContent = `${stats.total} saved`;
+  libraryCount.textContent = `已保存 ${stats.total}`;
   spriteCount.textContent = String(stats.sprites || generatedAssets.length);
   tileCount.textContent = String(stats.tiles || (project.tileSize === '32x32' ? 9 : 6));
   renderExportCenter();
@@ -187,7 +263,7 @@ function renderLibrary() {
   if (!visibleAssets.length) {
     const empty = document.createElement('p');
     empty.className = 'empty-state';
-    empty.textContent = 'No saved assets for this filter yet.';
+    empty.textContent = '当前筛选下还没有已保存素材。';
     assetList.replaceChildren(empty);
   }
 }
@@ -199,7 +275,7 @@ function getCurrentProjectId() {
 function getCurrentProjectAssets() {
   return filterLibraryAssets(savedAssets, {
     projectId: getCurrentProjectId(),
-    type: 'All'
+    type: '全部'
   });
 }
 
@@ -212,7 +288,7 @@ function renderExportCenter() {
   manifestEngine.textContent = manifest.project.targetEngine;
   manifestRoot.textContent = manifest.project.targetEngine === 'Unity' ? 'Assets/SpriteForge' : 'res://spriteforge';
   manifestPreview.textContent = JSON.stringify(manifest, null, 2);
-  packageFileCount.textContent = `${packageFiles.length} files`;
+  packageFileCount.textContent = `${packageFiles.length} 个文件`;
   downloadManifestButton.disabled = manifest.summary.total === 0;
   downloadZipButton.disabled = manifest.summary.total === 0;
 }
@@ -239,7 +315,7 @@ function renderPaletteEditor() {
     const label = document.createElement('label');
     label.className = 'color-control';
     label.innerHTML = `
-      <span>Color ${index + 1}</span>
+      <span>颜色 ${index + 1}</span>
       <input type="color" value="${color}" data-palette-index="${index}" />
     `;
     return label;
@@ -271,8 +347,8 @@ function renderProject() {
   sizeBadge.textContent = project.tileSize;
   styleBadge.textContent = project.artStyle;
   styleSummary.textContent = `${project.artStyle} / ${project.cameraView} / ${project.gameType}`;
-  styleLockTitle.textContent = `${project.artStyle} Pack`;
-  styleLockDescription.textContent = `${project.targetEngine} export, ${project.cameraView.toLowerCase()} view, ${project.tileSize} source grid, palette locked for repeatable asset batches.`;
+  styleLockTitle.textContent = `${project.artStyle}素材包`;
+  styleLockDescription.textContent = `${project.targetEngine} 导出，${project.cameraView}，${project.tileSize} 源网格，锁定调色板以保持批量素材风格一致。`;
   assetTypeCount.textContent = String(project.assetTypes.length);
   paletteCount.textContent = String(project.palette.length);
   manifestEngine.textContent = project.targetEngine;
@@ -319,12 +395,23 @@ function renderSelectOptions(selectElement, values) {
 }
 
 function initializeGeneratorSchemaControls() {
+  renderSelectOptions(projectForm.elements.gameType, gameTypes);
+  renderSelectOptions(projectForm.elements.targetEngine, targetEngines);
+  renderSelectOptions(projectForm.elements.artStyle, artStyles);
+  renderSelectOptions(projectForm.elements.cameraView, cameraViews);
   renderSelectOptions(generatorForm.elements.assetType, assetTypes);
   renderSelectOptions(generatorForm.elements.size, assetSizes);
   renderSelectOptions(generatorForm.elements.count, generationCounts);
   renderSelectOptions(generatorForm.elements.outlineMode, outlineModes);
   renderSelectOptions(generatorForm.elements.colorMode, colorModes);
   renderSelectOptions(generatorForm.elements.intendedUse, intendedUses);
+
+  generatorForm.elements.assetType.value = '角色';
+  generatorForm.elements.size.value = project.tileSize;
+  generatorForm.elements.count.value = '4';
+  generatorForm.elements.outlineMode.value = '中描边';
+  generatorForm.elements.colorMode.value = '项目调色板';
+  generatorForm.elements.intendedUse.value = '玩家角色';
 }
 
 function renderRequestPreview() {
@@ -333,7 +420,7 @@ function renderRequestPreview() {
 
   requestPreview.textContent = JSON.stringify(request, null, 2);
   validationList.replaceChildren(
-    ...(result.valid ? [createValidationItem('Request schema valid', true)] : result.errors.map((error) => createValidationItem(error, false)))
+    ...(result.valid ? [createValidationItem('生成请求结构有效', true)] : result.errors.map((error) => createValidationItem(error, false)))
   );
 
   return { request, result };
@@ -341,17 +428,17 @@ function renderRequestPreview() {
 
 function renderJobStatus(job) {
   activeJob = job;
-  activeJobId.textContent = job ? job.id : 'No active job';
+  activeJobId.textContent = job ? job.id : '暂无任务';
   jobProgressValue.textContent = job ? `${job.progress}%` : '0%';
   jobProgressBar.style.width = job ? `${job.progress}%` : '0%';
 
   if (!job) {
-    jobStatus.textContent = 'Idle';
+    jobStatus.textContent = '空闲';
     jobStatus.className = 'chip success';
     return;
   }
 
-  jobStatus.textContent = titleCase(job.status);
+  jobStatus.textContent = translateJobStatus(job.status);
   jobStatus.className = job.status === 'completed' ? 'chip success' : 'chip';
 }
 
@@ -365,7 +452,7 @@ async function createGenerationJob(request) {
   const payload = await response.json();
 
   if (!response.ok) {
-    throw new Error(payload.details?.join('; ') || payload.error || 'Failed to create generation job');
+    throw new Error(payload.details?.join('; ') || payload.error || '创建生成任务失败');
   }
 
   return payload;
@@ -376,7 +463,7 @@ async function fetchGenerationJob(jobId) {
   const payload = await response.json();
 
   if (!response.ok) {
-    throw new Error(payload.error || 'Failed to fetch generation job');
+    throw new Error(payload.error || '获取生成任务失败');
   }
 
   return payload;
@@ -401,7 +488,7 @@ async function pollGenerationJob(jobId) {
 }
 
 function showJobError(error) {
-  jobStatus.textContent = 'Failed';
+  jobStatus.textContent = '失败';
   jobStatus.className = 'chip danger';
   validationList.replaceChildren(createValidationItem(error.message, false));
 }
@@ -411,6 +498,17 @@ function createValidationItem(message, valid) {
   item.className = valid ? 'valid' : 'invalid';
   item.textContent = message;
   return item;
+}
+
+function translateJobStatus(status) {
+  const labels = {
+    queued: '排队中',
+    prompting: '提示词处理中',
+    generating: '生成中',
+    completed: '已完成'
+  };
+
+  return labels[status] || status;
 }
 
 function syncProjectFromForm() {
@@ -433,7 +531,7 @@ generatorForm.addEventListener('submit', async (event) => {
   const { request, result } = renderRequestPreview();
 
   if (!result.valid) {
-    jobStatus.textContent = 'Invalid';
+    jobStatus.textContent = '无效请求';
     jobStatus.className = 'chip danger';
     return;
   }
@@ -474,7 +572,7 @@ paletteEditor.addEventListener('input', (event) => {
 newProjectButton.addEventListener('click', () => {
   project = {
     ...createDefaultProject(),
-    name: 'Untitled Asset Pack',
+    name: '未命名素材包',
     palette: ['#25c7ff', '#f24b6a', '#f3c567', '#67e69f', '#b8f7ff', '#a68cff']
   };
   generatedAssets = [];
@@ -514,8 +612,8 @@ downloadZipButton.addEventListener('click', () => {
   downloadZipFile(createExportFileName(project).replace('_manifest.json', '_asset_package.zip'), zipBytes);
 });
 
-updateProjectForm();
 initializeGeneratorSchemaControls();
+updateProjectForm();
 renderLibraryFilters();
 renderProject();
 renderAssets();
