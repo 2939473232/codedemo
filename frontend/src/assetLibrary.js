@@ -1,4 +1,4 @@
-export const libraryFilters = ['全部', '角色', '敌人', '道具', '图标', '地块', '界面元素', '特效'];
+export const libraryFilters = ['全部', '角色', '敌人', '道具', '图标', '地图', '界面元素', '特效'];
 
 export function createLibraryAssetsFromJob(job) {
   if (!job?.result?.assets || !job?.request) {
@@ -26,7 +26,8 @@ export function mergeLibraryAssets(existingAssets, incomingAssets) {
 export function filterLibraryAssets(assets, { projectId, type = '全部' }) {
   return assets.filter((asset) => {
     const matchesProject = asset.projectId === projectId;
-    const matchesType = type === '全部' || asset.type === type;
+    const normalizedType = asset.type === '地块' ? '地图' : asset.type;
+    const matchesType = type === '全部' || normalizedType === type;
     return matchesProject && matchesType;
   });
 }
@@ -34,14 +35,15 @@ export function filterLibraryAssets(assets, { projectId, type = '全部' }) {
 export function getLibraryStats(assets, projectId) {
   const projectAssets = filterLibraryAssets(assets, { projectId, type: '全部' });
   const byType = projectAssets.reduce((counts, asset) => {
-    counts[asset.type] = (counts[asset.type] || 0) + 1;
+    const normalizedType = asset.type === '地块' ? '地图' : asset.type;
+    counts[normalizedType] = (counts[normalizedType] || 0) + 1;
     return counts;
   }, {});
 
   return {
     total: projectAssets.length,
-    sprites: projectAssets.filter((asset) => asset.type !== '地块').length,
-    tiles: byType.地块 || 0,
+    sprites: projectAssets.filter((asset) => !['地图', '地块'].includes(asset.type)).length,
+    tiles: byType.地图 || 0,
     byType
   };
 }

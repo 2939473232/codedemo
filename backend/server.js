@@ -28,7 +28,7 @@ const demoProject = {
   targetEngine: 'Godot',
   style: '32x32 像素奇幻',
   view: '俯视角',
-  assetTypes: ['角色', '道具', '图标', '地块'],
+  assetTypes: ['角色', '道具', '图标', '地图'],
   status: '原型'
 };
 

@@ -32,12 +32,12 @@ export function createExportReadme(manifest) {
     `美术风格：${manifest.project.artStyle}`,
     `素材数量：${manifest.summary.total}`,
     `动画资源：${animationCount}`,
-    `地块套件：${tileSetCount}`,
+    `地图套件：${tileSetCount}`,
     '',
     '此资源包由 SpriteForge fallback 导出流程生成。',
     'SVG 文件是原型阶段的轻量预览文件，后续可替换为真实 PNG 输出。',
     '角色和敌人素材会附带 spritesheet SVG 与帧坐标 JSON，可用于动画预览或引擎导入。',
-    '地块素材会附带 3x3 tileset 与拼接预览 JSON，便于接入 Tiled、Godot TileSet 或 Unity Tilemap。',
+    '地图素材会附带 3x3 tileset 与拼接预览 JSON，便于接入 Tiled、Godot TileSet 或 Unity Tilemap。',
     ''
   ].join('\n');
 }

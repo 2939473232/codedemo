@@ -73,6 +73,7 @@ function getAssetDirectory(type) {
     敌人: 'sprites',
     道具: 'icons',
     图标: 'icons',
+    地图: 'tiles',
     地块: 'tiles',
     界面元素: 'ui',
     特效: 'effects'

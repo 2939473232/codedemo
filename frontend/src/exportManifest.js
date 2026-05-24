@@ -25,8 +25,8 @@ export function createExportManifest(project, assets, options = {}) {
     },
     summary: {
       total: files.length,
-      sprites: files.filter((file) => file.type !== '地块').length,
-      tiles: files.filter((file) => file.type === '地块').length,
+      sprites: files.filter((file) => !['地图', '地块'].includes(file.type)).length,
+      tiles: files.filter((file) => ['地图', '地块'].includes(file.type)).length,
       animations: animatedAssets.length,
       tileSets: tileAssets.length,
       formats: ['PNG', 'SVG 预览', 'JSON', 'ZIP']
@@ -103,6 +103,7 @@ function getAssetDirectory(type) {
     敌人: 'sprites',
     道具: 'icons',
     图标: 'icons',
+    地图: 'tiles',
     地块: 'tiles',
     界面元素: 'ui',
     特效: 'effects'

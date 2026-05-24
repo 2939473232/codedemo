@@ -1,4 +1,4 @@
-export const tileAssetTypes = ['地块'];
+export const tileAssetTypes = ['地图', '地块'];
 export const tileVariants = [
   { id: 'center', name: '中心', row: 1, column: 1, terrain: 'grass' },
   { id: 'top', name: '上边缘', row: 0, column: 1, terrain: 'edge' },

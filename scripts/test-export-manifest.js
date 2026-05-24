@@ -25,12 +25,12 @@ const assets = [
   {
     id: 'asset_2',
     name: '草地',
-    type: '地块',
+    type: '地图',
     fileName: 'grass_32x32.png',
     width: 32,
     height: 32,
     transparentBackground: true,
-    tags: ['地块'],
+    tags: ['地图'],
     metadata: { fallback: true }
   }
 ];

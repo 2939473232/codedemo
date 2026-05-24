@@ -1,6 +1,6 @@
 export const generationSchemaVersion = '2026-05-23.p0';
 
-export const assetTypes = ['角色', '敌人', '道具', '图标', '地块', '界面元素', '特效'];
+export const assetTypes = ['角色', '敌人', '道具', '图标', '地图', '界面元素', '特效'];
 export const assetSizes = ['16x16', '32x32', '48x48', '64x64', '128x128'];
 export const generationCounts = [1, 2, 4, 8];
 export const outlineModes = ['无', '轻描边', '中描边', '粗描边'];
@@ -13,7 +13,7 @@ export const intendedUses = [
   '玩家角色',
   '敌人精灵',
   '背包图标',
-  '地图地块',
+  '地图素材',
   '界面元素',
   '特效帧'
 ];

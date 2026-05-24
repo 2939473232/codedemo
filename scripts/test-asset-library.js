@@ -18,7 +18,7 @@ const job = {
   result: {
     assets: [
       { id: 'asset_1', name: '骑士', type: '角色' },
-      { id: 'asset_2', name: '草地', type: '地块' }
+      { id: 'asset_2', name: '草地', type: '地图' }
     ]
   }
 };
@@ -32,7 +32,7 @@ const merged = mergeLibraryAssets([{ id: 'asset_1', name: '旧骑士', type: '�
 assert(merged.length === 2, 'Expected merge to replace duplicate ids');
 assert(merged[0].name === '骑士', 'Expected incoming asset to win duplicate merge');
 
-const filtered = filterLibraryAssets(merged, { projectId: 'forest-adventure', type: '地块' });
+const filtered = filterLibraryAssets(merged, { projectId: 'forest-adventure', type: '地图' });
 assert(filtered.length === 1, 'Expected type filter to work');
 
 const stats = getLibraryStats(merged, 'forest-adventure');

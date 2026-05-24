@@ -21,11 +21,11 @@
       <main class="workspace">
         <nav class="rail" aria-label="主导航">
           <div class="rail-logo">S</div>
-          <button class="rail-item active" type="button" aria-label="工作台" data-nav-target="generator">工</button>
-          <button class="rail-item" type="button" aria-label="素材库" data-nav-target="library">素</button>
-          <button class="rail-item" type="button" aria-label="地块" data-nav-target="tileset">块</button>
-          <button class="rail-item" type="button" aria-label="导出" data-nav-target="export">出</button>
-          <button class="rail-item" type="button" aria-label="设置" data-nav-target="settings">设</button>
+          <button class="rail-item active" type="button" aria-label="工作台" data-nav-target="generator">工作台</button>
+          <button class="rail-item" type="button" aria-label="素材库" data-nav-target="library">素材库</button>
+          <button class="rail-item" type="button" aria-label="地图" data-nav-target="tileset">地图</button>
+          <button class="rail-item" type="button" aria-label="导出" data-nav-target="export">导出</button>
+          <button class="rail-item" type="button" aria-label="设置" data-nav-target="settings">设置</button>
         </nav>
 
         <section class="console">
@@ -48,7 +48,7 @@
           <div class="tabs" role="tablist" aria-label="工作区分区">
             <button class="tab active" type="button" data-nav-target="generator">生成</button>
             <button class="tab" type="button" data-nav-target="animation">角色</button>
-            <button class="tab" type="button" data-nav-target="tileset">地块</button>
+            <button class="tab" type="button" data-nav-target="tileset">地图</button>
             <button class="tab" type="button" data-nav-target="library">素材库</button>
             <button class="tab" type="button" data-nav-target="export">导出</button>
           </div>
@@ -95,7 +95,7 @@
                   </select>
                 </label>
                 <label>
-                  地块尺寸
+                  地图单元尺寸
                   <select id="tileSize" name="tileSize">
                     <option value="16x16">16x16</option>
                     <option value="32x32">32x32</option>
@@ -135,7 +135,7 @@
             <aside class="style-card" aria-label="风格继承预览">
               <p class="section-kicker">风格锁定</p>
               <h3 id="styleLockTitle">像素奇幻素材包</h3>
-              <p id="styleLockDescription">生成请求会继承项目引擎、视角、地块尺寸、调色板和风格描述。</p>
+              <p id="styleLockDescription">生成请求会继承项目引擎、视角、地图单元尺寸、调色板和风格描述。</p>
               <div class="style-metrics">
                 <span><strong id="assetTypeCount">4</strong> 类素材</span>
                 <span><strong id="paletteCount">6</strong> 个颜色</span>
@@ -166,7 +166,7 @@
 
               <div class="preset-row" aria-label="生成快捷预设">
                 <button class="preset-button active" type="button" data-generation-preset="character">角色</button>
-                <button class="preset-button" type="button" data-generation-preset="tile">地块</button>
+                <button class="preset-button" type="button" data-generation-preset="tile">地图</button>
                 <button class="preset-button" type="button" data-generation-preset="item">道具</button>
                 <button class="preset-button" type="button" data-generation-preset="icon">图标</button>
               </div>
@@ -270,20 +270,20 @@
             </div>
           </section>
 
-          <section class="tileset-panel page-section" id="tilesetSection" aria-label="地块拼接预览" data-section-key="tileset">
+          <section class="tileset-panel page-section" id="tilesetSection" aria-label="地图拼接预览" data-section-key="tileset">
             <div class="panel-heading">
               <div>
-                <p class="section-kicker">地块</p>
-                <h3>Tile Set 拼接预览</h3>
+                <p class="section-kicker">地图</p>
+                <h3>地图 Tile Set 拼接预览</h3>
               </div>
-              <span class="chip" id="tileSetStatus">等待地块素材</span>
+              <span class="chip" id="tileSetStatus">等待地图素材</span>
             </div>
             <div class="tileset-grid">
               <div class="tilemap-preview" id="tileMapPreview"></div>
               <div class="tileset-details">
-                <strong id="tileSetTitle">暂无可预览地块</strong>
-                <p id="tileSetDescription">生成地块素材后，这里会自动展示九宫格 tile set 和地图拼接效果。</p>
-                <div class="tile-variant-grid" id="tileVariantGrid" aria-label="九宫格地块变体"></div>
+                <strong id="tileSetTitle">暂无可预览地图</strong>
+                <p id="tileSetDescription">生成地图素材后，这里会自动展示九宫格 tile set 和地图拼接效果。</p>
+                <div class="tile-variant-grid" id="tileVariantGrid" aria-label="九宫格地图变体"></div>
               </div>
             </div>
           </section>
@@ -321,7 +321,7 @@
                   <dd id="spriteCount">4</dd>
                 </div>
                 <div>
-                  <dt>地块</dt>
+                  <dt>地图</dt>
                   <dd id="tileCount">9</dd>
                 </div>
                 <div>

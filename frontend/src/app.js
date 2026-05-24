@@ -78,7 +78,7 @@ const projectStorageKey = 'spriteforge.project.v1';
 const assetLibraryStorageKey = 'spriteforge.assetLibrary.v1';
 
 const defaultPalette = ['#35d0ff', '#ff4d6d', '#ffd166', '#72ef9b', '#b8f7ff', '#f49f4d'];
-const defaultAssetTypes = ['角色', '道具', '图标', '地块'];
+const defaultAssetTypes = ['角色', '道具', '图标', '地图'];
 const generationPresets = {
   character: {
     assetType: '角色',
@@ -88,9 +88,9 @@ const generationPresets = {
     colorMode: '项目调色板'
   },
   tile: {
-    assetType: '地块',
-    intendedUse: '地图地块',
-    description: '可无缝拼接的森林草地地块',
+    assetType: '地图',
+    intendedUse: '地图素材',
+    description: '可无缝拼接的森林草地地图',
     outlineMode: '轻描边',
     colorMode: '项目调色板'
   },
@@ -128,7 +128,8 @@ const legacyLabelMap = {
   Enemy: '敌人',
   Item: '道具',
   Icon: '图标',
-  Tile: '地块',
+  Tile: '地图',
+  地块: '地图',
   UI: '界面元素',
   Effect: '特效',
   All: '全部',
@@ -142,7 +143,8 @@ const legacyLabelMap = {
   'Player Character': '玩家角色',
   'Enemy Sprite': '敌人精灵',
   'Inventory Icon': '背包图标',
-  'Map Tile': '地图地块',
+  'Map Tile': '地图素材',
+  地图地块: '地图素材',
   'UI Element': '界面元素',
   'Effect Frame': '特效帧'
 };
@@ -164,7 +166,7 @@ const seedAssets = [
   { name: '红围巾骑士', type: '角色', fileName: 'red_scarf_knight_32x32.png', color: '#35d0ff', accent: '#ff4d6d' },
   { name: '铁剑', type: '道具', fileName: 'iron_sword_32x32.png', color: '#b8f7ff', accent: '#ffd166' },
   { name: '治疗药水', type: '图标', fileName: 'health_potion_32x32.png', color: '#ff4d6d', accent: '#72ef9b' },
-  { name: '森林地块', type: '地块', fileName: 'forest_tile_32x32.png', color: '#72ef9b', accent: '#2b6f4a' }
+  { name: '森林地图', type: '地图', fileName: 'forest_tile_32x32.png', color: '#72ef9b', accent: '#2b6f4a' }
 ];
 
 let project = loadProject();
@@ -524,9 +526,9 @@ function renderTileSetPreview() {
   const [asset] = getTileAssets(generatedAssets);
 
   if (!asset) {
-    tileSetStatus.textContent = '等待地块素材';
-    tileSetTitle.textContent = '暂无可预览地块';
-    tileSetDescription.textContent = '生成地块素材后，这里会自动展示九宫格 tile set 和地图拼接效果。';
+    tileSetStatus.textContent = '等待地图素材';
+    tileSetTitle.textContent = '暂无可预览地图';
+    tileSetDescription.textContent = '生成地图素材后，这里会自动展示九宫格 tile set 和地图拼接效果。';
     tileMapPreview.replaceChildren(createTileSetEmptyState());
     tileVariantGrid.replaceChildren();
     return;
@@ -535,7 +537,7 @@ function renderTileSetPreview() {
   const tileSet = createTileSet(asset);
   const preview = createTileMapPreview(asset);
   tileSetStatus.textContent = `${tileSet.tiles.length} 个变体`;
-  tileSetTitle.textContent = `${asset.name} 九宫格地块`;
+  tileSetTitle.textContent = `${asset.name} 九宫格地图`;
   tileSetDescription.textContent = `${tileSet.tileWidth}x${tileSet.tileHeight} 单块，${tileSet.columns}x${tileSet.rows} tile set，可随 ZIP 导出 tileset JSON 和拼接预览。`;
   tileMapPreview.replaceChildren(...preview.cells.map((cell) => createTileCell(asset, cell, 'map')));
   tileVariantGrid.replaceChildren(...tileSet.tiles.map((tile) => createTileCell(asset, tile, 'variant')));
@@ -544,7 +546,7 @@ function renderTileSetPreview() {
 function createTileSetEmptyState() {
   const empty = document.createElement('p');
   empty.className = 'empty-state';
-  empty.textContent = '当前结果没有地块素材。';
+  empty.textContent = '当前结果没有地图素材。';
   return empty;
 }
 

@@ -23,7 +23,7 @@ const manifest = {
     {
       id: 'asset_2',
       name: '草地',
-      type: '地块',
+      type: '地图',
       path: 'res://spriteforge/tiles/grass_32x32.png',
       width: 32,
       height: 32,
@@ -38,7 +38,7 @@ const zip = createZip(files);
 
 assert(files.length === 9, 'Expected manifest, readme, previews, animation files, and tileset files');
 assert(files.some((file) => file.path === 'spriteforge/manifest.json'), 'Expected manifest file');
-assert(files.some((file) => file.path === 'spriteforge/README.md' && file.content.includes('地块套件：1')), 'Expected Chinese README file');
+assert(files.some((file) => file.path === 'spriteforge/README.md' && file.content.includes('地图套件：1')), 'Expected Chinese README file');
 assert(files.some((file) => file.path.endsWith('knight_32x32.svg')), 'Expected SVG preview');
 assert(files.some((file) => file.path === 'spriteforge/animations/knight_32x32_spritesheet.svg'), 'Expected spritesheet SVG');
 assert(files.some((file) => file.path === 'spriteforge/animations/knight_32x32_frames.json'), 'Expected frame metadata');
