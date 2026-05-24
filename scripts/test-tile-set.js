@@ -32,6 +32,7 @@ const tileSet = createTileSet(tileAssets[0]);
 const metadata = createTileSetMetadata(tileAssets[0]);
 const preview = createTileMapPreview(tileAssets[0]);
 const svg = createTileSetSvg(tileAssets[0]);
+const imageSvg = createTileSetSvg({ ...tileAssets[0], imageUrl: 'https://example.com/grass.png' });
 
 assert(tileAssets.length === 1, 'Expected only tile assets');
 assert(tileSet.tiles.length === 9, 'Expected 3x3 tile variants');
@@ -39,6 +40,7 @@ assert(tileSet.width === 96 && tileSet.height === 96, 'Expected 3x3 sheet dimens
 assert(metadata.tiles.some((tile) => tile.variant === 'top_left'), 'Expected corner metadata');
 assert(preview.cells.length === 36, 'Expected 6x6 tile map preview');
 assert(svg.includes('data-tile="center"'), 'Expected SVG tile markers');
+assert(imageSvg.includes('https://example.com/grass.png'), 'Expected image-based tileset reference');
 
 console.log('Tile set tests passed.');
 

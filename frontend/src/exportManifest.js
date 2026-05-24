@@ -76,6 +76,7 @@ function createManifestFile(asset, root) {
     type: asset.type,
     sourceJobId: asset.sourceJobId,
     path: `${root}/${category}/${asset.fileName || `${asset.id}.png`}`,
+    imageUrl: asset.imageUrl,
     width: asset.width || 32,
     height: asset.height || 32,
     transparentBackground: Boolean(asset.transparentBackground),

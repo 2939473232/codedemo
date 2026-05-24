@@ -64,11 +64,32 @@ export function createSpriteSheetMetadata(asset, options = {}) {
 }
 
 export function createSpriteSheetSvg(asset, options = {}) {
+  if (asset.imageUrl) {
+    return createImageBasedSpriteSheetSvg(asset, options);
+  }
+
   const sheet = createSpriteSheet(asset, options);
   const color = asset.color || '#35d0ff';
   const accent = asset.accent || '#ff4d6d';
   const title = escapeXml(`${asset.name || asset.id} spritesheet`);
   const frameNodes = sheet.frames.map((frame) => createFrameNode(frame, color, accent)).join('\n');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${sheet.width}" height="${sheet.height}" viewBox="0 0 ${sheet.width} ${sheet.height}">
+  <title>${title}</title>
+  <rect width="${sheet.width}" height="${sheet.height}" fill="none"/>
+${frameNodes}
+</svg>
+`;
+}
+
+function createImageBasedSpriteSheetSvg(asset, options = {}) {
+  const sheet = createSpriteSheet(asset, options);
+  const title = escapeXml(`${asset.name || asset.id} spritesheet`);
+  const imageUrl = escapeXml(asset.imageUrl);
+  const frameNodes = sheet.frames.map((frame) => `  <g data-frame="${escapeXml(frame.name)}">
+    <rect x="${frame.x}" y="${frame.y}" width="${frame.width}" height="${frame.height}" fill="none"/>
+    <image href="${imageUrl}" x="${frame.x}" y="${frame.y}" width="${frame.width}" height="${frame.height}" preserveAspectRatio="xMidYMid meet"/>
+  </g>`).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${sheet.width}" height="${sheet.height}" viewBox="0 0 ${sheet.width} ${sheet.height}">
   <title>${title}</title>

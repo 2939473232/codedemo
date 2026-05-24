@@ -1,13 +1,8 @@
 import { validateGenerationRequest } from '../shared/generationSchema.js';
 import { createFallbackManifest, generateFallbackAssets } from './fallbackGenerator.js';
+import { isWanxConfigured, generateWanxAssets } from './wanxProvider.js';
 
 const jobs = new Map();
-const jobTimeline = [
-  { status: 'queued', progress: 12, delay: 0 },
-  { status: 'prompting', progress: 34, delay: 260 },
-  { status: 'generating', progress: 72, delay: 620 },
-  { status: 'completed', progress: 100, delay: 980 }
-];
 
 export function createGenerationJob(request) {
   const validation = validateGenerationRequest(request);
@@ -36,7 +31,7 @@ export function createGenerationJob(request) {
   };
 
   jobs.set(job.id, job);
-  scheduleJob(job.id);
+  runJob(job.id);
 
   return {
     ok: true,
@@ -67,30 +62,62 @@ export function listGenerationJobs() {
   return Array.from(jobs.values()).map(serializeJob).reverse();
 }
 
-function scheduleJob(jobId) {
-  for (const step of jobTimeline) {
-    setTimeout(() => {
-      const job = jobs.get(jobId);
+async function runJob(jobId) {
+  const job = jobs.get(jobId);
 
-      if (!job) {
-        return;
-      }
+  if (!job) {
+    return;
+  }
 
-      job.status = step.status;
-      job.progress = step.progress;
-      job.updatedAt = new Date().toISOString();
-
-      if (step.status === 'completed') {
-        job.result = buildJobResult(job);
-      }
-    }, step.delay);
+  try {
+    updateJob(job, 'queued', 12);
+    await delay(180);
+    updateJob(job, 'prompting', 34);
+    await delay(180);
+    updateJob(job, 'generating', 72);
+    job.result = await buildJobResult(job);
+    updateJob(job, 'completed', 100);
+  } catch (error) {
+    job.error = error.message;
+    job.result = buildFallbackJobResult(job, {
+      provider: 'fallback',
+      warning: error.message
+    });
+    updateJob(job, 'completed', 100);
   }
 }
 
-function buildJobResult(job) {
+async function buildJobResult(job) {
+  const provider = getImageProvider();
+
+  if (provider === 'wanx') {
+    if (!isWanxConfigured()) {
+      throw new Error('未配置 DASHSCOPE_API_KEY，已使用演示生成。');
+    }
+
+    const assets = await generateWanxAssets(job.request);
+    return createResult(job.request, assets, {
+      provider: 'wanx-v1',
+      manifestProvider: 'wanx-v1'
+    });
+  }
+
+  return buildFallbackJobResult(job, {
+    provider: 'fallback'
+  });
+}
+
+function buildFallbackJobResult(job, options = {}) {
   const { request } = job;
   const assets = generateFallbackAssets(request);
+  return createResult(request, assets, {
+    provider: options.provider || 'fallback',
+    warning: options.warning,
+    manifestProvider: 'fallback-generator'
+  });
+}
 
+function createResult(request, assets, options) {
   return {
     assetCount: request.count,
     assetType: request.assetType,
@@ -98,9 +125,19 @@ function buildJobResult(job) {
     engine: request.target.engine,
     exportHint: `${request.target.engine} 可用的 ${request.size} PNG 序列`,
     previewSeed: `${request.projectId}:${request.assetType}:${request.description}`,
+    provider: options.provider,
+    warning: options.warning || null,
     assets,
-    manifest: createFallbackManifest(request, assets)
+    manifest: createFallbackManifest(request, assets, {
+      generatedBy: options.manifestProvider || options.provider
+    })
   };
+}
+
+function updateJob(job, status, progress) {
+  job.status = status;
+  job.progress = progress;
+  job.updatedAt = new Date().toISOString();
 }
 
 function serializeJob(job) {
@@ -119,4 +156,14 @@ function serializeJob(job) {
 function createJobId() {
   const random = Math.random().toString(36).slice(2, 8);
   return `job_${Date.now().toString(36)}_${random}`;
+}
+
+function getImageProvider() {
+  return String(process.env.SPRITEFORGE_IMAGE_PROVIDER || 'fallback').toLowerCase();
+}
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

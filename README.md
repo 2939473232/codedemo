@@ -57,6 +57,18 @@ http://localhost:5173/api/health
 http://localhost:5173/api/generation/schema
 ```
 
+## 真实图片生成
+
+默认情况下项目使用演示 fallback 生成，便于没有 API Key 时完整体验流程。要启用通义万相 `wanx-v1`，请在本地项目根目录创建 `.env` 文件，内容类似：
+
+```text
+SPRITEFORGE_IMAGE_PROVIDER=wanx
+DASHSCOPE_API_KEY=你的 DashScope API Key
+WANX_MODEL=wanx-v1
+```
+
+`.env` 已加入 `.gitignore`，不要把真实密钥提交到 GitHub。启用后，生成任务会先把角色、道具、图标、地图等需求扩写成游戏素材 prompt，再调用 `wanx-v1` 生成图片；如果接口失败或未配置 Key，会自动回落到演示生成。
+
 生成任务 API：
 
 ```text

@@ -30,6 +30,7 @@ const animatedAssets = getAnimatedAssets(assets);
 const sheet = createSpriteSheet(animatedAssets[0]);
 const metadata = createSpriteSheetMetadata(animatedAssets[0]);
 const svg = createSpriteSheetSvg(animatedAssets[0]);
+const imageSvg = createSpriteSheetSvg({ ...animatedAssets[0], imageUrl: 'https://example.com/knight.png' });
 
 assert(animatedAssets.length === 1, 'Expected only character assets to animate');
 assert(sheet.frames.length === 8, 'Expected idle and walk frames');
@@ -38,6 +39,7 @@ assert(sheet.frames[4].action === 'walk', 'Expected walk frames after idle frame
 assert(metadata.animations.idle.length === 4, 'Expected idle animation metadata');
 assert(metadata.animations.walk.length === 4, 'Expected walk animation metadata');
 assert(svg.includes('data-frame="walk_02"'), 'Expected SVG frame markers');
+assert(imageSvg.includes('https://example.com/knight.png'), 'Expected image-based spritesheet reference');
 
 console.log('Sprite sheet tests passed.');
 

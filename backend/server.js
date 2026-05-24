@@ -3,8 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadLocalEnv } from './env.js';
 import { createGenerationJob, getGenerationJob, listGenerationJobs } from './generationJobs.js';
 import { generationSchema } from '../shared/generationSchema.js';
+
+loadLocalEnv();
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url));
 const frontendDir = join(rootDir, 'frontend');

@@ -5,6 +5,10 @@ const textEncoder = new TextEncoder();
 const crcTable = createCrcTable();
 
 export function createAssetSvg(asset) {
+  if (asset.imageUrl) {
+    return createImageReferenceSvg(asset);
+  }
+
   const width = asset.width || 32;
   const height = asset.height || 32;
   const color = asset.color || '#35d0ff';
@@ -17,6 +21,20 @@ export function createAssetSvg(asset) {
   <rect x="${Math.floor(width * 0.12)}" y="${Math.floor(height * 0.58)}" width="${Math.ceil(width * 0.3)}" height="${Math.ceil(height * 0.24)}" fill="${accent}"/>
   <rect x="${Math.floor(width * 0.62)}" y="${Math.floor(height * 0.22)}" width="${Math.ceil(width * 0.16)}" height="${Math.ceil(height * 0.16)}" fill="#ffffff" opacity="0.82"/>
   <title>${name}</title>
+</svg>
+`;
+}
+
+function createImageReferenceSvg(asset) {
+  const width = asset.width || 32;
+  const height = asset.height || 32;
+  const name = escapeXml(asset.name || asset.id || 'asset');
+  const imageUrl = escapeXml(asset.imageUrl);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <title>${name}</title>
+  <rect width="${width}" height="${height}" fill="#0c1118"/>
+  <image href="${imageUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid meet"/>
 </svg>
 `;
 }

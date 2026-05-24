@@ -96,11 +96,32 @@ export function createTileSetMetadata(asset, options = {}) {
 }
 
 export function createTileSetSvg(asset, options = {}) {
+  if (asset.imageUrl) {
+    return createImageBasedTileSetSvg(asset, options);
+  }
+
   const sheet = createTileSet(asset, options);
   const color = asset.color || '#72ef9b';
   const accent = asset.accent || '#2b6f4a';
   const title = escapeXml(`${asset.name || asset.id} tileset`);
   const nodes = sheet.tiles.map((tile) => createTileNode(tile, color, accent)).join('\n');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${sheet.width}" height="${sheet.height}" viewBox="0 0 ${sheet.width} ${sheet.height}">
+  <title>${title}</title>
+  <rect width="${sheet.width}" height="${sheet.height}" fill="none"/>
+${nodes}
+</svg>
+`;
+}
+
+function createImageBasedTileSetSvg(asset, options = {}) {
+  const sheet = createTileSet(asset, options);
+  const title = escapeXml(`${asset.name || asset.id} tileset`);
+  const imageUrl = escapeXml(asset.imageUrl);
+  const nodes = sheet.tiles.map((tile) => `  <g data-tile="${escapeXml(tile.variant)}">
+    <rect x="${tile.x}" y="${tile.y}" width="${tile.width}" height="${tile.height}" fill="#0c1118"/>
+    <image href="${imageUrl}" x="${tile.x}" y="${tile.y}" width="${tile.width}" height="${tile.height}" preserveAspectRatio="xMidYMid slice"/>
+  </g>`).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${sheet.width}" height="${sheet.height}" viewBox="0 0 ${sheet.width} ${sheet.height}">
   <title>${title}</title>

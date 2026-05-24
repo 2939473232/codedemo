@@ -29,6 +29,7 @@ const assets = [
     fileName: 'grass_32x32.png',
     width: 32,
     height: 32,
+    imageUrl: 'https://example.com/grass.png',
     transparentBackground: true,
     tags: ['地图'],
     metadata: { fallback: true }
@@ -51,6 +52,7 @@ assert(manifest.directories.animations === 'res://spriteforge/animations', 'Expe
 assert(manifest.directories.tileSets === 'res://spriteforge/tilesets', 'Expected tileset directory');
 assert(manifest.files[0].path === 'res://spriteforge/sprites/knight_32x32.png', 'Expected Godot sprite path');
 assert(manifest.files[1].path === 'res://spriteforge/tiles/grass_32x32.png', 'Expected Godot tile path');
+assert(manifest.files[1].imageUrl === 'https://example.com/grass.png', 'Expected generated image URL');
 assert(createExportFileName(project) === 'forest-adventure_manifest.json', 'Expected manifest file name');
 
 console.log('Export manifest tests passed.');

@@ -27,6 +27,9 @@ const request = createGenerationRequest(
 const firstRun = generateFallbackAssets(request);
 const secondRun = generateFallbackAssets(request);
 const manifest = createFallbackManifest(request, firstRun);
+const wanxManifest = createFallbackManifest(request, [{ ...firstRun[0], imageUrl: 'https://example.com/asset.png' }], {
+  generatedBy: 'wanx-v1'
+});
 
 assert(firstRun.length === 4, 'Expected 4 fallback assets');
 assert(firstRun[0].id === secondRun[0].id, 'Expected stable asset ids');
@@ -34,6 +37,8 @@ assert(firstRun[0].fileName.endsWith('_32x32.png'), 'Expected size in file name'
 assert(firstRun[0].metadata.fallback === true, 'Expected fallback metadata flag');
 assert(manifest.files.length === firstRun.length, 'Expected manifest files to match assets');
 assert(manifest.files[0].path.includes('/sprites/'), 'Expected typed export path');
+assert(wanxManifest.generatedBy === 'wanx-v1', 'Expected custom manifest provider');
+assert(wanxManifest.files[0].imageUrl === 'https://example.com/asset.png', 'Expected image URL in manifest');
 
 console.log('Fallback generator tests passed.');
 

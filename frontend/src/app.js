@@ -257,17 +257,26 @@ function createPixelPreview(asset, index) {
   preview.style.setProperty('--asset-color', asset.color);
   preview.style.setProperty('--asset-accent', asset.accent);
 
-  const core = document.createElement('span');
-  core.className = 'pixel-core';
-  const shine = document.createElement('span');
-  shine.className = 'pixel-shine';
-  preview.append(core, shine);
+  if (asset.imageUrl) {
+    const image = document.createElement('img');
+    image.className = 'generated-preview';
+    image.src = asset.imageUrl;
+    image.alt = asset.name;
+    image.loading = 'lazy';
+    preview.append(image);
+  } else {
+    const core = document.createElement('span');
+    core.className = 'pixel-core';
+    const shine = document.createElement('span');
+    shine.className = 'pixel-shine';
+    preview.append(core, shine);
+  }
 
   const details = document.createElement('div');
   const title = document.createElement('strong');
   title.textContent = asset.name;
   const meta = document.createElement('p');
-  meta.textContent = `${asset.type} / ${asset.width || 32}x${asset.height || 32} / v${index + 1}`;
+  meta.textContent = `${asset.type} / ${asset.width || 32}x${asset.height || 32} / ${getAssetProviderLabel(asset)} / v${index + 1}`;
   details.append(title, meta);
 
   cell.append(preview, details);
@@ -292,9 +301,7 @@ function renderLibrary() {
     const item = document.createElement('button');
     item.className = 'queue-item';
     item.type = 'button';
-    const swatch = document.createElement('span');
-    swatch.className = 'mini-swatch';
-    swatch.style.background = asset.color;
+    const swatch = createLibraryThumbnail(asset);
     const copy = document.createElement('span');
     const title = document.createElement('strong');
     title.textContent = asset.name;
@@ -675,6 +682,13 @@ function renderJobStatus(job) {
 
   jobStatus.textContent = translateJobStatus(job.status);
   jobStatus.className = job.status === 'completed' ? 'chip success' : 'chip';
+
+  if (job.status === 'completed' && job.result?.provider) {
+    validationList.replaceChildren(
+      createValidationItem(`生成模式：${translateProvider(job.result.provider)}`, true),
+      ...(job.result.warning ? [createValidationItem(job.result.warning, false)] : [])
+    );
+  }
 }
 
 async function createGenerationJob(request) {
@@ -750,6 +764,22 @@ function showJobError(error) {
   setGenerationInProgress(false);
 }
 
+function createLibraryThumbnail(asset) {
+  if (asset.imageUrl) {
+    const image = document.createElement('img');
+    image.className = 'mini-thumbnail';
+    image.src = asset.imageUrl;
+    image.alt = asset.name;
+    image.loading = 'lazy';
+    return image;
+  }
+
+  const swatch = document.createElement('span');
+  swatch.className = 'mini-swatch';
+  swatch.style.background = asset.color;
+  return swatch;
+}
+
 function createValidationItem(message, valid) {
   const item = document.createElement('li');
   item.className = valid ? 'valid' : 'invalid';
@@ -766,6 +796,20 @@ function translateJobStatus(status) {
   };
 
   return labels[status] || status;
+}
+
+function getAssetProviderLabel(asset) {
+  return translateProvider(asset.metadata?.provider || (asset.imageUrl ? 'wanx-v1' : 'fallback'));
+}
+
+function translateProvider(provider) {
+  const labels = {
+    'wanx-v1': '真实生成',
+    wanx: '真实生成',
+    fallback: '演示生成'
+  };
+
+  return labels[provider] || provider;
 }
 
 function setGenerationInProgress(isInProgress) {

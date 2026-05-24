@@ -34,18 +34,19 @@ export function generateFallbackAssets(request) {
   });
 }
 
-export function createFallbackManifest(request, assets) {
+export function createFallbackManifest(request, assets, options = {}) {
   return {
     projectId: request.projectId,
     projectName: request.projectName,
     engine: request.target.engine,
     style: request.style.artStyle,
     size: request.size,
-    generatedBy: 'fallback-generator',
+    generatedBy: options.generatedBy || 'fallback-generator',
     files: assets.map((asset) => ({
       id: asset.id,
       name: asset.name,
       path: `assets/${request.projectId}/${getAssetDirectory(asset.type)}/${asset.fileName}`,
+      imageUrl: asset.imageUrl,
       width: asset.width,
       height: asset.height,
       type: asset.type,

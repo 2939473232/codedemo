@@ -27,6 +27,7 @@ const manifest = {
       path: 'res://spriteforge/tiles/grass_32x32.png',
       width: 32,
       height: 32,
+      imageUrl: 'https://example.com/grass.png',
       color: '#72ef9b',
       accent: '#2b6f4a'
     }
@@ -45,6 +46,7 @@ assert(files.some((file) => file.path === 'spriteforge/animations/knight_32x32_f
 assert(files.some((file) => file.path === 'spriteforge/tilesets/grass_32x32_tileset.svg'), 'Expected tileset SVG');
 assert(files.some((file) => file.path === 'spriteforge/tilesets/grass_32x32_tileset.json'), 'Expected tileset metadata');
 assert(files.some((file) => file.path === 'spriteforge/tilesets/grass_32x32_preview.json'), 'Expected tile map preview');
+assert(files.some((file) => file.path.endsWith('grass_32x32.svg') && file.content.includes('https://example.com/grass.png')), 'Expected image URL preview reference');
 assert(zip[0] === 0x50 && zip[1] === 0x4b, 'Expected ZIP signature');
 assert(zip.length > 200, 'Expected non-empty ZIP payload');
 

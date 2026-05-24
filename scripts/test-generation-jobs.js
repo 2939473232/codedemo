@@ -55,6 +55,7 @@ async function waitForJobCompletion(jobId) {
     if (result.payload.status === 'completed') {
       assert(result.payload.result.assets.length === 4, 'Expected completed job assets');
       assert(result.payload.result.manifest.files.length === 4, 'Expected completed job manifest files');
+      assert(result.payload.result.provider === 'fallback', 'Expected fallback provider by default');
       return;
     }
 
